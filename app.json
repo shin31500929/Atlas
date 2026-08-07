@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "atlas",
-    "slug": "atlas",
+    "name": "atlas-temp",
+    "slug": "atlas-temp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "atlas",
+    "scheme": "atlastemp",
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon"
@@ -19,24 +19,22 @@
       },
       "predictiveBackGestureEnabled": false
     },
-    "web": {
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
-    },
-    "plugins": [
-      "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "backgroundColor": "#208AEF",
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
-        }
-      ]
-    ],
-    "experiments": {
-      "typedRoutes": true,
-      "reactCompiler": true
+"web": {
+  "output": "single",
+  "favicon": "./assets/images/favicon.png"
+},
+"plugins": [
+  [
+    "expo-splash-screen",
+    {
+      "backgroundColor": "#208AEF",
+      "image": "./assets/images/splash-icon.png",
+      "imageWidth": 76
     }
+  ]
+],
+"experiments": {
+  "reactCompiler": true
+}
   }
 }
