@@ -1,3 +1,4 @@
+import ButtonComponent from "@/components/button";
 import { View, Text } from "react-native";
 
 export function TestScreen() {
@@ -11,7 +12,7 @@ export function TestScreen() {
     >
       <Text>Test</Text>
     {/*componentsのテスト*/}
-    
+    <ButtonComponent/>
     </View>
   );
 }
