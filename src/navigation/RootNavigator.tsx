@@ -1,7 +1,7 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { HomeScreen } from "../screens/HomeScreen";
-import { PostScreen } from "../screens/PostScreen";
-import { ProfileScreen } from "../screens/ProfileScreen";
+import { HomeScreen } from "../screens//home/HomeScreen";
+import { PostScreen } from "../screens/post/PostScreen";
+import { ProfileScreen } from "../screens/profile/ProfileScreen";
 import { TestScreen } from "../screens/TestScreen";
 import type { RootStackParamList } from "./type";
 
