@@ -1,4 +1,4 @@
-import ButtonComponent from "@/components/button";
+import ButtonComponent from "../components/Button";
 import { View, Text } from "react-native";
 
 export function TestScreen() {
