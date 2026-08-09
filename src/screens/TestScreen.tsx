@@ -10,7 +10,8 @@ export function TestScreen() {
       }}
     >
       <Text>Test</Text>
-    //componentsのテスト
+    {/*componentsのテスト*/}
+    
     </View>
   );
 }

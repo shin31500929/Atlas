@@ -1,6 +1,10 @@
-import { View, Text } from "react-native";
+import { View, Text, Button } from "react-native";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import type {RootStackParamList} from "../navigation/type";
 
-export function HomeScreen() {
+type Props = NativeStackScreenProps<RootStackParamList, "Home">;
+
+export function HomeScreen({ navigation }: Props) {
   return (
     <View
       style={{
@@ -10,6 +14,7 @@ export function HomeScreen() {
       }}
     >
       <Text>Atlas</Text>
+      <Button title="Go to Test" onPress={() => navigation.navigate("Test")} />
     </View>
   );
 }

@@ -1,7 +1,9 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { HomeScreen } from "../screens/HomeScreen";
+import { TestScreen } from "../screens/TestScreen";
+import type { RootStackParamList } from "./type";
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export function RootNavigator() {
   return (
@@ -9,9 +11,13 @@ export function RootNavigator() {
       <Stack.Screen
         name="Home"
         component={HomeScreen}
-        options={{
-          title: "Atlas",
-        }}
+        options={{ title: "Atlas" }}
+      />
+
+      <Stack.Screen
+        name="Test"
+        component={TestScreen}
+        options={{ title: "Test" }}
       />
     </Stack.Navigator>
   );
