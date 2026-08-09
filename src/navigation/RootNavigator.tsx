@@ -1,17 +1,17 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { HomeScreen } from "../screens//home/HomeScreen";
-import { PostScreen } from "../screens/post/PostScreen";
-import { ProfileScreen } from "../screens/profile/ProfileScreen";
-import { LoginScreen } from "../screens/auth/LoginScreen";
-import { ConfirmScreen } from "../screens/recording/ConfirmScreen";
-import { RecordingScreen } from "../screens/recording/RecordingScreen";
-import { RecordingMap } from "../screens/recording/components/RecordingMap";
-import { TestScreen } from "../screens/TestScreen";
-import type { RootStackParamList } from "./type";
+import HomeScreen from "../screens//home/HomeScreen";
+import LoginScreen from "../screens/auth/LoginScreen";
+import PostScreen from "../screens/post/PostScreen";
+import ProfileScreen from "../screens/profile/ProfileScreen";
+import RecordingMap from "../screens/recording/components/RecordingMap";
+import ConfirmScreen from "../screens/recording/ConfirmScreen";
+import RecordingScreen from "../screens/recording/RecordingScreen";
+import TestScreen from "../screens/TestScreen";
+import type RootStackParamList from "./type";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-export function RootNavigator() {
+function RootNavigator() {
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -57,3 +57,5 @@ export function RootNavigator() {
     </Stack.Navigator>
   );
 }
+
+export default RootNavigator;

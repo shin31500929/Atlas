@@ -1,6 +1,6 @@
 import { View, Text } from "react-native";
 
-export function TestScreen() {
+function TestScreen() {
   return (
     <View
       style={{
@@ -15,3 +15,5 @@ export function TestScreen() {
     </View>
   );
 }
+
+export default TestScreen;

@@ -1,10 +1,10 @@
 import { View, Text, Button } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import type {RootStackParamList} from "../../navigation/type";
+import type RootStackParamList from "../../navigation/type";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Profile">;
 
-export function ProfileScreen({ navigation }: Props) {
+function ProfileScreen({ navigation }: Props) {
   return (
     <View
       style={{
@@ -18,3 +18,5 @@ export function ProfileScreen({ navigation }: Props) {
     </View>
   );
 }
+
+export default ProfileScreen;
