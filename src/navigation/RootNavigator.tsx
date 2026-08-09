@@ -1,5 +1,6 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { HomeScreen } from "../screens/HomeScreen";
+import { PostScreen } from "../screens/PostScreen";
 import { TestScreen } from "../screens/TestScreen";
 import type { RootStackParamList } from "./type";
 
@@ -13,7 +14,11 @@ export function RootNavigator() {
         component={HomeScreen}
         options={{ title: "Atlas" }}
       />
-
+      <Stack.Screen
+        name="Post"
+        component={PostScreen}
+        options={{ title: "Post" }}
+      />
       <Stack.Screen
         name="Test"
         component={TestScreen}

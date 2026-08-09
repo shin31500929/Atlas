@@ -14,6 +14,7 @@ export function HomeScreen({ navigation }: Props) {
       }}
     >
       <Text>Atlas</Text>
+      <Button title="Go to Post" onPress={() => navigation.navigate("Post")} />
       <Button title="Go to Test" onPress={() => navigation.navigate("Test")} />
     </View>
   );
