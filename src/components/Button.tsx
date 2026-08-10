@@ -3,47 +3,49 @@ import { View } from "react-native";
 import { Button } from "react-native-paper";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
-const ButtonComponent = () => (
+type ButtonComponentProps = {
+  text: string;
+  iconName: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
+  onPress: () => void;
+  buttonColor: string;
+  textColor: string;
+  borderColor?: string;
+};
+
+const ButtonComponent = ({
+  text,
+  iconName,
+  onPress,
+  buttonColor,
+  textColor,
+  borderColor
+}: ButtonComponentProps) => (
   <View style={{ flexDirection: "row", gap: 10 }}>
     <Button
       icon={({color}) => (
         <MaterialCommunityIcons
-            name="pause"
+            name={iconName}
             size={25}
             color={color} 
         />
       )}
       mode="contained"
-      buttonColor="#EDF1F1"
-      textColor="#283D36"
+      buttonColor={buttonColor}
+      textColor={textColor}
       contentStyle={{
         alignItems: "center",
       }}
       style={{
-        borderColor: "#6B7974",
-        borderWidth: 1,
+        ...(borderColor 
+          ? {
+            borderColor,
+            borderWidth: 1 
+          } 
+        : {}),
       }}
-      onPress={() => console.log("Pause")}
+      onPress={onPress}
     >
-      一時停止
-    </Button>
-    <Button
-      icon={({color}) => (
-        <MaterialCommunityIcons
-            name="stop"
-            size={25}
-            color={color}
-        />
-      )}
-      mode="contained"
-      buttonColor="#FF4C4F"
-      textColor="#FFFFFF"
-      contentStyle={{
-        alignItems: "center",
-      }}
-      onPress={() => console.log("Stop")}
-    >
-      記録終了
+      {text}
     </Button>
   </View>
 );
