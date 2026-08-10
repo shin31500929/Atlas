@@ -14,7 +14,7 @@ export function TestScreen() {
     {/*componentsのテスト*/}
     <ButtonComponent
       text="文字を入力"
-      iconName="pause"
+      //iconName="pause"//アイコンを表示したい場合はこの行のコメントアウトを外してね
       buttonColor="#EDF1F1"
       textColor="#283D36"
       borderColor="#6B7974"//枠線なしの場合はこの行を消してね
