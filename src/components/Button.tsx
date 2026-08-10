@@ -5,7 +5,7 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 type ButtonComponentProps = {
   text: string;
-  iconName: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
+  iconName?: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
   onPress: () => void;
   buttonColor: string;
   textColor: string;
@@ -22,13 +22,17 @@ const ButtonComponent = ({
 }: ButtonComponentProps) => (
   <View style={{ flexDirection: "row", gap: 10 }}>
     <Button
-      icon={({color}) => (
-        <MaterialCommunityIcons
-            name={iconName}
-            size={25}
-            color={color} 
-        />
-      )}
+      icon={
+        iconName 
+          ? ({color}) => (
+            <MaterialCommunityIcons
+              name={iconName}
+              size={25}
+              color={color} 
+            />
+          )
+          : undefined
+      }
       mode="contained"
       buttonColor={buttonColor}
       textColor={textColor}
