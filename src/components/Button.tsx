@@ -10,9 +10,6 @@ type ButtonComponentProps = {
   buttonColor: string;
   textColor: string;
   borderColor?: string;
-  width?: number;
-  height?: number;
-  textAlign?: "left" | "center" | "right";
 };
 
 const ButtonComponent = ({
@@ -21,10 +18,7 @@ const ButtonComponent = ({
   onPress,
   buttonColor,
   textColor,
-  borderColor,
-  width,
-  height,
-  textAlign = "center",
+  borderColor
 }: ButtonComponentProps) => (
   <View style={{ flexDirection: "row", gap: 10 }}>
     <Button
@@ -43,16 +37,9 @@ const ButtonComponent = ({
       buttonColor={buttonColor}
       textColor={textColor}
       contentStyle={{
-        justifyContent: 
-        textAlign === "left" 
-        ? "flex-start" 
-        : textAlign === "right" 
-        ? "flex-end" 
-        : "center",
+        alignItems: "center",
       }}
       style={{
-        width,
-        height,
         ...(borderColor 
           ? {
             borderColor,
