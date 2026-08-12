@@ -1,7 +1,11 @@
 import ButtonComponent from "../components/Button";
 import { View, Text } from "react-native";
+import Input from "../components/Input";
+import { useState } from "react";
 
 export function TestScreen() {
+  const [name, setName] = useState("");
+
   return (
     <View
       style={{
@@ -12,13 +16,20 @@ export function TestScreen() {
     >
       <Text>Test</Text>
     {/*componentsのテスト*/}
-    <ButtonComponent
-      text="文字を入力"
-      //iconName="pause"//アイコンを表示したい場合はこの行のコメントアウトを外してね
-      buttonColor="#EDF1F1"
-      textColor="#283D36"
-      borderColor="#6B7974"//枠線なしの場合はこの行を消してね
-      onPress={() => console.log("文字を入力ボタンを押した")}
+
+    <Input
+      placeholder="文字を入力"
+      value={name}
+      onChangeText={setName}
+      activeOutlineColor="#00fe33"//入力中の枠線の色を指定
+      outlineColor="#f40606"//枠線の色を指定
+      textColor="#639cdc"//入力文字の色を指定
+      placeholderTextColor="#888888"//プレースホルダー文字の色を指定
+      backgroundColor="#f9f9f9"
+      width={300}
+      height={50}
+      borderRadius={25}//入力欄の角丸の大きさを指定
+      borderVisible={false}//枠線の表示・非表示を切り替え
     />
     </View>
   );
