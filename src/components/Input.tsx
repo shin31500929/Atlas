@@ -1,4 +1,5 @@
 import { TextInput } from "react-native-paper";
+import { StyleProp, ViewStyle } from "react-native";
 
 type InputProps = {
     value: string;
@@ -12,11 +13,9 @@ type InputProps = {
     placeholderTextColor?: string;
     backgroundColor?: string;
 
-    width?: number;
-    height?: number;
-    borderRadius?: number;
+    style?: StyleProp<ViewStyle>;
+    outlineStyle?: StyleProp<ViewStyle>;
 
-    borderVisible?: boolean;
 };
 
 const Input = ({
@@ -28,30 +27,25 @@ const Input = ({
     placeholder,
     placeholderTextColor,
     backgroundColor,
-    width,
-    height,
-    borderRadius,
-    borderVisible = true,
+    style,
+    outlineStyle,
 }: InputProps) => (
     <TextInput
         mode="outlined"
         value={value}
         onChangeText={onChangeText}
-        activeOutlineColor={
-            borderVisible ? activeOutlineColor : "transparent"}
-        outlineColor={
-            borderVisible ? outlineColor : "transparent"}
         textColor={textColor}
         placeholder={placeholder}
         placeholderTextColor={placeholderTextColor}
-        style={{
-            width: width,
-            height: height,
-            backgroundColor: backgroundColor,
-        }}
-        outlineStyle={{
-            borderRadius,
-        }}
+        activeOutlineColor={activeOutlineColor}
+        outlineColor={outlineColor}
+        style={[
+            {
+                backgroundColor: backgroundColor,
+            },
+            style,
+        ]}
+        outlineStyle={outlineStyle}
     />
 );
 
