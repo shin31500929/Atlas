@@ -18,19 +18,15 @@ const ButtonComponent = ({
   onPress,
   buttonColor,
   textColor,
-  borderColor
+  borderColor,
 }: ButtonComponentProps) => (
   <View style={{ flexDirection: "row", gap: 10 }}>
     <Button
       icon={
-        iconName 
-          ? ({color}) => (
-            <MaterialCommunityIcons
-              name={iconName}
-              size={25}
-              color={color} 
-            />
-          )
+        iconName
+          ? ({ color }) => (
+              <MaterialCommunityIcons name={iconName} size={25} color={color} />
+            )
           : undefined
       }
       mode="contained"
@@ -40,12 +36,12 @@ const ButtonComponent = ({
         alignItems: "center",
       }}
       style={{
-        ...(borderColor 
+        ...(borderColor
           ? {
-            borderColor,
-            borderWidth: 1 
-          } 
-        : {}),
+              borderColor,
+              borderWidth: 1,
+            }
+          : {}),
       }}
       onPress={onPress}
     >
