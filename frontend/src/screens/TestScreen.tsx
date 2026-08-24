@@ -1,4 +1,4 @@
-import ButtonComponent from "../components/Button";
+import LoadingComponent from "../components/Loading";
 import { View, Text } from "react-native";
 
 function TestScreen() {
@@ -12,13 +12,9 @@ function TestScreen() {
     >
       <Text>Test</Text>
     {/*componentsのテスト*/}
-    <ButtonComponent
-      text="文字を入力"
-      //iconName="pause"//アイコンを表示したい場合はこの行のコメントアウトを外してね
-      buttonColor="#EDF1F1"
-      textColor="#283D36"
-      borderColor="#6B7974"//枠線なしの場合はこの行を消してね
-      onPress={() => console.log("文字を入力ボタンを押した")}
+    <LoadingComponent 
+      //color="#25b1ac"　//色を指定可能 
+      //size="large"   //サイズを指定"large"　または　"small"　または　{数値}　で指定可能
     />
     </View>
   );

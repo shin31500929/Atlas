@@ -19,22 +19,23 @@
       },
       "predictiveBackGestureEnabled": false
     },
-"web": {
-  "output": "single",
-  "favicon": "./assets/images/favicon.png"
-},
-"plugins": [
-  [
-    "expo-splash-screen",
-    {
-      "backgroundColor": "#208AEF",
-      "image": "./assets/images/splash-icon.png",
-      "imageWidth": 76
+    "web": {
+      "output": "single",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#208AEF",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 76
+        }
+      ],
+      "expo-image"
+    ],
+    "experiments": {
+      "reactCompiler": true
     }
-  ]
-],
-"experiments": {
-  "reactCompiler": true
-}
   }
 }
