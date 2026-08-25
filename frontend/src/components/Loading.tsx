@@ -1,26 +1,12 @@
-import { View, ActivityIndicator, StyleSheet } from "react-native";
+import { ActivityIndicator } from "react-native";
 
 type LoadingProps = {
-    color?: string;
-    size?: "small" | "large" | number;
+  color?: string;
+  size?: "small" | "large" | number;
 };
 
 const Loading = ({ color, size }: LoadingProps) => {
-  return (
-    <View style={styles.container}>
-      <ActivityIndicator
-        color={color} 
-        size={size} 
-      />
-    </View>
-  );
+  return <ActivityIndicator color={color} size={size} />;
 };
-
-const styles = StyleSheet.create({
-  container: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
-});
 
 export default Loading;
