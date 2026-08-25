@@ -2,7 +2,7 @@ import { Avatar, Button, Card, Text } from "react-native-paper";
 
 type Props = {
   UserId: string;
-  Icon?: string;
+  Image?: string;
 };
 
 const CardComponent = (props: Props) => (
@@ -11,12 +11,14 @@ const CardComponent = (props: Props) => (
       <Card.Title
         title={props.UserId}
         subtitle="Card Subtitle"
-        left={(iconProps) =>
-          props.Icon ?? (
-            <Avatar.Icon
-              {...iconProps}
-              icon={props.Icon ?? { uri: "https://picsum.photos/700" }}
+        left={(ImageProps) =>
+          props.Image ? (
+            <Avatar.Image
+              {...ImageProps}
+              source={props.Image ?? { uri: "https://picsum.photos/700" }}
             />
+          ) : (
+            void
           )
         }
       />
