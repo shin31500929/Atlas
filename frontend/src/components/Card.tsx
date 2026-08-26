@@ -7,7 +7,14 @@ type CardProps = {
 
 const Card = ({ children, style }: CardProps) => {
   return (
-    <View style={style}>
+    <View
+      style={[
+        {
+          borderColor: "#8f9995",
+        },
+        style,
+        ]}
+    >
       {children}
     </View>
   );
