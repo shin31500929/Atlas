@@ -16,10 +16,7 @@ export class RecordsService {
     return this.records;
   }
 
-  create(data: {
-    title: string;
-    startedAt: string;
-  }) {
+  create(data: { title: string; startedAt: string }) {
     const record = {
       id: String(this.records.length + 1),
       title: data.title,
