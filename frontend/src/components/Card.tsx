@@ -4,6 +4,8 @@ import { Avatar, Button, Card, Text } from "react-native-paper";
 type Props = {
   UserId: string;
   Image?: ImageSourcePropType;
+  SubTitle?: string;
+  Text?: string;
 };
 
 const CardComponent = (props: Props) => (
@@ -11,7 +13,7 @@ const CardComponent = (props: Props) => (
     <Card.Content>
       <Card.Title
         title={props.UserId}
-        subtitle="Card Subtitle"
+        subtitle={props.SubTitle}
         left={(ImageProps) =>
           props.Image ? (
             <Avatar.Image
@@ -21,7 +23,7 @@ const CardComponent = (props: Props) => (
           ) : null
         }
       />
-      <Text variant="bodyMedium">bodyMedium</Text>
+      <Text variant="bodyMedium">{props.Text}</Text>
     </Card.Content>
     <Card.Cover source={{ uri: "https://picsum.photos/700" }} />
     <Card.Actions>
