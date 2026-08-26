@@ -1,8 +1,9 @@
+import { ImageSourcePropType } from "react-native";
 import { Avatar, Button, Card, Text } from "react-native-paper";
 
 type Props = {
   UserId: string;
-  Image?: string;
+  Image?: ImageSourcePropType;
 };
 
 const CardComponent = (props: Props) => (
@@ -17,9 +18,7 @@ const CardComponent = (props: Props) => (
               {...ImageProps}
               source={props.Image ?? { uri: "https://picsum.photos/700" }}
             />
-          ) : (
-            void
-          )
+          ) : null
         }
       />
       <Text variant="bodyMedium">bodyMedium</Text>
