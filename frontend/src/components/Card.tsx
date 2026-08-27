@@ -15,11 +15,13 @@ function CalcDiffTime(PostedAt: Date) {
   let diff_hh = Math.floor((CurrentTime - PostedAtTime) / (1000 * 60 * 60));
   let diff_mm = Math.floor((CurrentTime - PostedAtTime) / (1000 * 60));
 
-  diff_hh > 24
-    ? (PassedTime = `${PostedAt.toLocaleString("ja-JP", options)}`)
-    : 24 > diff_hh && diff_hh >= 1
-      ? (PassedTime = `${diff_hh.toLocaleString()}時間前`)
-      : (PassedTime = `${diff_mm.toLocaleString()}分前`);
+  if (diff_hh >= 24) {
+    PassedTime = `${PostedAt.toLocaleString("ja-JP", options)}`;
+  } else if (diff_hh >= 1) {
+    PassedTime = `${diff_hh.toLocaleString()}時間前`;
+  } else {
+    PassedTime = `${diff_mm.toLocaleString()}分前`;
+  }
   return PassedTime;
 }
 
