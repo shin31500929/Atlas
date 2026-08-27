@@ -30,7 +30,6 @@ type Props = {
   postedAt?: Date;
   image?: ImageSourcePropType;
   text?: string;
-  subTitle?: string;
 };
 
 const CardComponent = (props: Props) => (
