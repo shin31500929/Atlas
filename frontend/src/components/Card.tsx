@@ -30,6 +30,7 @@ type Props = {
   postedAt?: Date;
   image?: ImageSourcePropType;
   text?: string;
+  subTitle?: string;
 };
 
 const CardComponent = (props: Props) => (
@@ -40,11 +41,13 @@ const CardComponent = (props: Props) => (
         subtitle={props.postedAt ? CalcDiffTime(props.postedAt) : null}
         left={(ImageProps) =>
           props.image ? (
+            <Avatar.Image {...ImageProps} source={props.image} />
+          ) : (
             <Avatar.Image
               {...ImageProps}
-              source={props.image ?? { uri: "https://picsum.photos/700" }}
+              source={{ uri: "https://picsum.photos/700" }}
             />
-          ) : null
+          )
         }
       />
       <Text variant="bodyMedium">{props.text}</Text>
