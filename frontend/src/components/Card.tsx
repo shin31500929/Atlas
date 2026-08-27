@@ -26,29 +26,29 @@ function CalcDiffTime(PostedAt: Date) {
 }
 
 type Props = {
-  UserId: string;
-  PostedAt?: Date;
-  Image?: ImageSourcePropType;
-  Text?: string;
-  SubTitle?: string;
+  userId: string;
+  postedAt?: Date;
+  image?: ImageSourcePropType;
+  text?: string;
+  subTitle?: string;
 };
 
 const CardComponent = (props: Props) => (
   <Card>
     <Card.Content>
       <Card.Title
-        title={props.UserId}
-        subtitle={props.PostedAt ? CalcDiffTime(props.PostedAt) : null}
+        title={props.userId}
+        subtitle={props.postedAt ? CalcDiffTime(props.postedAt) : null}
         left={(ImageProps) =>
-          props.Image ? (
+          props.image ? (
             <Avatar.Image
               {...ImageProps}
-              source={props.Image ?? { uri: "https://picsum.photos/700" }}
+              source={props.image ?? { uri: "https://picsum.photos/700" }}
             />
           ) : null
         }
       />
-      <Text variant="bodyMedium">{props.Text}</Text>
+      <Text variant="bodyMedium">{props.text}</Text>
     </Card.Content>
     <Card.Cover source={{ uri: "https://picsum.photos/700" }} />
     <Card.Actions>
