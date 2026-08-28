@@ -26,6 +26,10 @@ function CalcDiffTime(PostedAt: Date) {
   return PassedTime;
 }
 
+const handleClick = (option: string) => {
+  console.log(`${option}がクリックされました`);
+};
+
 // todo: カードの機能をアイコン,投稿画像,タイトル,投稿日時表示の4つに絞ってそれ以外をコメントアウト（テキストなど）
 type Props = {
   userId: string; // ユーザID
@@ -57,8 +61,8 @@ const CardComponent = (props: Props) => (
     </Card.Content>
     <Card.Cover source={props.postedImage} />
     <Card.Actions>
-      <Button>Cancel</Button>
-      <Button>Ok</Button>
+      <Button onPress={() => handleClick("Cancel")}>Cancel</Button>
+      <Button onPress={() => handleClick("Ok")}>Ok</Button>
     </Card.Actions>
   </Card>
 );
