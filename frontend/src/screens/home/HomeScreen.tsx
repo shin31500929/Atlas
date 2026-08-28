@@ -1,83 +1,87 @@
-// import { View, Text, Button } from "react-native";
-// import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-// import type RootStackParamList from "../../navigation/type";
-
-// type Props = NativeStackScreenProps<RootStackParamList, "Home">;
-
-// function HomeScreen({ navigation }: Props) {
-//   return (
-//     <View
-//       style={{
-//         flex: 1,
-//         justifyContent: "center",
-//         alignItems: "center",
-//       }}
-//     >
-//       <Text>Atlas</Text>
-//       <Button title="Go to Post" onPress={() => navigation.navigate("Post")} />
-//       <Button title="Go to Profile" onPress={() => navigation.navigate("Profile")} />
-//       <Button title="Go to Login" onPress={() => navigation.navigate("Login")} />
-//       <Button title="Go to Recording" onPress={() => navigation.navigate("Recording")} />
-//       <Button title="Go to Confirm" onPress={() => navigation.navigate("Confirm")} />
-//       <Button title="Go to RecordingMap" onPress={() => navigation.navigate("RecordingMap")} />
-//       <Button title="Go to Test" onPress={() => navigation.navigate("Test")} />
-//     </View>
-//   );
-// }
-
-// export default HomeScreen;
-
-
-import React, { useEffect } from "react";
-import { View, Text } from "react-native";
+import React, { useCallback, useState } from "react";
+import { View, Text, FlatList, Button } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import type RootStackParamList from "../../navigation/type";
 import {
-  createPost,
   getPosts,
   likePost,
   unlikePost,
 } from "../../api/posts";
-import {
-  getRecords,
-  createRecord,
-} from "../../api/records";
 
-export default function HomeScreen() {
-  useEffect(() => {
-    const testApi = async () => {
-      try {
-        // Posts
-        const posts = await getPosts();
-        console.log("posts:", posts);
+type Props = NativeStackScreenProps<RootStackParamList, "Home">;
 
-        const newPost = await createPost("Frontendからの投稿");
-        console.log("newPost:", newPost);
+type Post = {
+  id: string;
+  content: string;
+  likeCount: number;
+  liked: boolean;
+  createdAt: string;
+};
 
-        const likedPost = await likePost(newPost.id);
-        console.log("likedPost:", likedPost);
+function HomeScreen({ navigation }: Props) {
+  const [posts, setPosts] = useState<Post[]>([]);
 
-        const unlikedPost = await unlikePost(newPost.id);
-        console.log("unlikedPost:", unlikedPost);
-
-        // Records
-        const records = await getRecords();
-        console.log("records:", records);
-
-        const newRecord = await createRecord(
-          "Frontendからの記録",
-          new Date().toISOString(),
-        );
-        console.log("newRecord:", newRecord);
-      } catch (error) {
-        console.error("APIエラー:", error);
-      }
-    };
-
-    testApi();
+  const fetchPosts = useCallback(async () => {
+    try {
+      const data = await getPosts();
+      console.log("posts:", data);
+      setPosts(data);
+    } catch (error) {
+      console.error("APIエラー:", error);
+    }
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchPosts();
+    }, [fetchPosts])
+  );
+
+  const handleLike = async (post: Post) => {
+    try {
+      const updatedPost = post.liked
+        ? await unlikePost(post.id)
+        : await likePost(post.id);
+
+      setPosts((currentPosts) =>
+        currentPosts.map((item) =>
+          item.id === post.id ? updatedPost : item
+        )
+      );
+    } catch (error) {
+      console.error("いいねエラー:", error);
+    }
+  };
 
   return (
     <View>
       <Text>Home</Text>
+
+      <Button
+        title="投稿する"
+        onPress={() => navigation.navigate("Post")}
+      />
+
+      <FlatList
+        data={posts}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View>
+            <Text>{item.content}</Text>
+
+            <Text>いいね: {item.likeCount}</Text>
+
+            <Button
+              title={item.liked ? "いいね解除" : "いいね"}
+              onPress={() => handleLike(item)}
+            />
+          </View>
+        )}
+      />
     </View>
+
   );
 }
+
+export default HomeScreen;
