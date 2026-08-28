@@ -32,7 +32,7 @@ type Props = {
   postedAt: Date; //　投稿日時
   postedImage: ImageSourcePropType; // 投稿画像
   title: string; // タイトル
-  image?: ImageSourcePropType; // アイコン
+  iconImage?: ImageSourcePropType; // アイコン
   // text?: string;
 };
 
@@ -42,16 +42,16 @@ const CardComponent = (props: Props) => (
       <Card.Title
         title={props.userId}
         subtitle={props.postedAt ? CalcDiffTime(props.postedAt) : null}
-        left={(ImageProps) =>
-          props.image ? (
-            <Avatar.Image {...ImageProps} source={props.image} />
-          ) : (
+        left={(ImageProps) => {
+          if (props.iconImage) {
+            <Avatar.Image {...ImageProps} source={props.iconImage} />;
+          } else {
             <Avatar.Image
               {...ImageProps}
               source={{ uri: "https://picsum.photos/700" }}
-            />
-          )
-        }
+            />;
+          }
+        }}
       />
       <Text variant="bodyMedium">{props.text}</Text>
     </Card.Content>
