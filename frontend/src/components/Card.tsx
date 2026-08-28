@@ -1,5 +1,5 @@
 import { ImageSourcePropType } from "react-native";
-import { Avatar, Button, Card, Text } from "react-native-paper";
+import { Avatar, Button, Card } from "react-native-paper";
 
 function CalcDiffTime(PostedAt: Date) {
   const options = {
@@ -53,7 +53,7 @@ const CardComponent = (props: Props) => (
           }
         }}
       />
-      <Text variant="bodyMedium">{props.text}</Text>
+      {/* <Text variant="bodyMedium">{props.text}</Text> */}
     </Card.Content>
     <Card.Cover source={{ uri: "https://picsum.photos/700" }} />
     <Card.Actions>
