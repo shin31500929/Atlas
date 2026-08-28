@@ -46,12 +46,14 @@ const CardComponent = (props: Props) => (
         subtitle={props.postedAt ? CalcDiffTime(props.postedAt) : null}
         left={(ImageProps) => {
           if (props.iconImage) {
-            <Avatar.Image {...ImageProps} source={props.iconImage} />;
+            return <Avatar.Image {...ImageProps} source={props.iconImage} />;
           } else {
-            <Avatar.Image
-              {...ImageProps}
-              source={{ uri: "https://picsum.photos/700" }}
-            />;
+            return (
+              <Avatar.Image
+                {...ImageProps}
+                source={{ uri: "https://picsum.photos/700" }}
+              />
+            );
           }
         }}
       />
