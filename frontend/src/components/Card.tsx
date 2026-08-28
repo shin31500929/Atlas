@@ -32,7 +32,7 @@ type Props = {
   postedAt: Date; //　投稿日時
   iconImage?: ImageSourcePropType; // アイコン
   postedImage: ImageSourcePropType; // 投稿画像
-  title: string; // タイトル
+  // title: string; // タイトル
   // text?: string;
 };
 
