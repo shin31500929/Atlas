@@ -14,6 +14,7 @@ function CalcDiffTime(PostedAt: Date) {
   let PassedTime: string = "";
   let diff_hh = Math.floor((CurrentTime - PostedAtTime) / (1000 * 60 * 60));
   let diff_mm = Math.floor((CurrentTime - PostedAtTime) / (1000 * 60));
+  // todo: 投稿日時表示がちょうど24時間前の場合の条件分岐
 
   if (diff_hh >= 24) {
     PassedTime = `${PostedAt.toLocaleString("ja-JP", options)}`;
@@ -25,11 +26,14 @@ function CalcDiffTime(PostedAt: Date) {
   return PassedTime;
 }
 
+// todo: カードの機能をアイコン,投稿画像,タイトル,投稿日時表示の4つに絞ってそれ以外をコメントアウト（テキストなど）
 type Props = {
-  userId: string;
-  postedAt?: Date;
-  image?: ImageSourcePropType;
-  text?: string;
+  userId: string; // ユーザID
+  postedAt: Date; //　投稿日時
+  postedImage: ImageSourcePropType; // 投稿画像
+  title: string; // タイトル
+  image?: ImageSourcePropType; // アイコン
+  // text?: string;
 };
 
 const CardComponent = (props: Props) => (
@@ -58,5 +62,6 @@ const CardComponent = (props: Props) => (
     </Card.Actions>
   </Card>
 );
+// todo: 下部のcancel,okのボタンにonpressを追加して何か表示できるようにしておいてもらえると,後々動作確認で楽になるのでやって欲しい
 
 export default CardComponent;
