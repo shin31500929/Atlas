@@ -55,7 +55,7 @@ const CardComponent = (props: Props) => (
       />
       {/* <Text variant="bodyMedium">{props.text}</Text> */}
     </Card.Content>
-    <Card.Cover source={{ uri: "https://picsum.photos/700" }} />
+    <Card.Cover source={props.postedImage} />
     <Card.Actions>
       <Button>Cancel</Button>
       <Button>Ok</Button>
