@@ -1,13 +1,9 @@
-import React, { useCallback, useState } from "react";
-import { View, Text, FlatList, Button } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { useCallback, useState } from "react";
+import { Button, FlatList, Text, View } from "react-native";
+import { getPosts, likePost, unlikePost } from "../../api/posts";
 import type RootStackParamList from "../../navigation/type";
-import {
-  getPosts,
-  likePost,
-  unlikePost,
-} from "../../api/posts";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Home">;
 
@@ -35,7 +31,7 @@ function HomeScreen({ navigation }: Props) {
   useFocusEffect(
     useCallback(() => {
       fetchPosts();
-    }, [fetchPosts])
+    }, [fetchPosts]),
   );
 
   const handleLike = async (post: Post) => {
@@ -45,9 +41,7 @@ function HomeScreen({ navigation }: Props) {
         : await likePost(post.id);
 
       setPosts((currentPosts) =>
-        currentPosts.map((item) =>
-          item.id === post.id ? updatedPost : item
-        )
+        currentPosts.map((item) => (item.id === post.id ? updatedPost : item)),
       );
     } catch (error) {
       console.error("いいねエラー:", error);
@@ -58,9 +52,11 @@ function HomeScreen({ navigation }: Props) {
     <View>
       <Text>Home</Text>
 
+      <Button title="投稿する" onPress={() => navigation.navigate("Post")} />
+
       <Button
-        title="投稿する"
-        onPress={() => navigation.navigate("Post")}
+        title="記録する"
+        onPress={() => navigation.navigate("Recording")}
       />
 
       <FlatList
@@ -80,7 +76,6 @@ function HomeScreen({ navigation }: Props) {
         )}
       />
     </View>
-
   );
 }
 

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { RecordsService } from './records.service';
 
 @Controller('records')
@@ -11,13 +11,12 @@ export class RecordsController {
   }
 
   @Post()
-  create(
-    @Body()
-    body: {
-      title: string;
-      startedAt: string;
-    },
-  ) {
+  create(@Body() body: { title: string; startedAt: string }) {
     return this.recordsService.create(body);
+  }
+
+  @Patch(':id')
+  end(@Param('id') id: string) {
+    return this.recordsService.end(id);
   }
 }
