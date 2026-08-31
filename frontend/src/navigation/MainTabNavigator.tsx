@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeScreen from "../screens//home/HomeScreen";
 import PostScreen from "../screens/post/PostScreen";
 import ProfileScreen from "../screens/profile/ProfileScreen";
+import SearchScreen from "../screens/search/SearchScreen";
 import TabType from "./TabType";
 
 const Tab = createBottomTabNavigator<TabType>();
@@ -18,6 +19,20 @@ function MainTabNavigator() {
           tabBarIcon: ({ focused, color, size }) => (
             <Ionicons
               name={focused ? "home" : "home-outline"}
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Search"
+        component={SearchScreen}
+        options={{
+          tabBarShowLabel: false,
+          tabBarIcon: ({ focused, color, size }) => (
+            <Ionicons
+              name={focused ? "search" : "search-outline"}
               size={size}
               color={color}
             />
