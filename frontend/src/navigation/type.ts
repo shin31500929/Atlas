@@ -7,6 +7,7 @@ type RootStackParamList = {
   RecordingMap: undefined;
   Profile: undefined;
   Test: undefined;
+  Search: undefined;
 };
 
 export default RootStackParamList;
