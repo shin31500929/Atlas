@@ -45,7 +45,7 @@ function MainTabNavigator() {
           tabBarShowLabel: false,
           tabBarIcon: ({ focused, color, size }) => (
             <Ionicons
-              name={focused ? "search" : "search-outline"}
+              name={focused ? "person-circle-outline" : "person-circle"}
               size={size}
               color={color}
             />
