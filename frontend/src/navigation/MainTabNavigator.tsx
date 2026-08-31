@@ -4,13 +4,19 @@ import HomeScreen from "../screens//home/HomeScreen";
 import PostScreen from "../screens/post/PostScreen";
 import ProfileScreen from "../screens/profile/ProfileScreen";
 // import SearchScreen from "../screens/search/SearchScreen";
+import { useWindowDimensions } from "react-native";
 import TabType from "./TabType";
 
 const Tab = createBottomTabNavigator<TabType>();
 
 function MainTabNavigator() {
+  const dimensions = useWindowDimensions();
   return (
-    <Tab.Navigator>
+    <Tab.Navigator
+      screenOptions={{
+        tabBarPosition: dimensions.width >= 768 ? "left" : "bottom",
+      }}
+    >
       <Tab.Screen
         name="Home"
         component={HomeScreen}
