@@ -9,7 +9,11 @@ const Tab = createBottomTabNavigator<TabType>();
 function MainTabNavigator() {
   return (
     <Tab.Navigator>
-      <Tab.Screen name="Home" component={HomeScreen}></Tab.Screen>
+      <Tab.Screen
+        name="Home"
+        component={HomeScreen}
+        options={{ tabBarLabelPosition: "below-icon" }}
+      ></Tab.Screen>
       <Tab.Screen name="Post" component={PostScreen}></Tab.Screen>
       <Tab.Screen name="Profile" component={ProfileScreen}></Tab.Screen>
     </Tab.Navigator>
