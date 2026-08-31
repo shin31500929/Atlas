@@ -11,11 +11,19 @@ function MainTabNavigator() {
     <Tab.Navigator>
       <Tab.Screen
         name="Home"
+        options={{ tabBarShowLabel: false }}
         component={HomeScreen}
-        options={{ tabBarLabelPosition: "below-icon" }}
       ></Tab.Screen>
-      <Tab.Screen name="Post" component={PostScreen}></Tab.Screen>
-      <Tab.Screen name="Profile" component={ProfileScreen}></Tab.Screen>
+      <Tab.Screen
+        name="Post"
+        options={{ tabBarShowLabel: false }}
+        component={PostScreen}
+      ></Tab.Screen>
+      <Tab.Screen
+        name="Profile"
+        options={{ tabBarShowLabel: false }}
+        component={ProfileScreen}
+      ></Tab.Screen>
     </Tab.Navigator>
   );
 }
