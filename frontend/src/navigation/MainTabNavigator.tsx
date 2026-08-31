@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeScreen from "../screens//home/HomeScreen";
 import PostScreen from "../screens/post/PostScreen";
 import ProfileScreen from "../screens/profile/ProfileScreen";
-import SearchScreen from "../screens/search/SearchScreen";
+// import SearchScreen from "../screens/search/SearchScreen";
 import TabType from "./TabType";
 
 const Tab = createBottomTabNavigator<TabType>();
@@ -25,7 +25,7 @@ function MainTabNavigator() {
           ),
         }}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Search"
         component={SearchScreen}
         options={{
@@ -38,7 +38,7 @@ function MainTabNavigator() {
             />
           ),
         }}
-      />
+      /> */}
       <Tab.Screen
         name="Post"
         component={PostScreen}
