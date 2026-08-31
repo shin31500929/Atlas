@@ -13,7 +13,7 @@ function SearchScreen({ navigation }: Props) {
         alignItems: "center",
       }}
     >
-      <Text>Serch</Text>
+      <Text>Search</Text>
     </View>
   );
 }
