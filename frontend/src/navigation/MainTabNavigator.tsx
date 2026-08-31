@@ -1,3 +1,4 @@
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeScreen from "../screens//home/HomeScreen";
 import PostScreen from "../screens/post/PostScreen";
@@ -11,19 +12,46 @@ function MainTabNavigator() {
     <Tab.Navigator>
       <Tab.Screen
         name="Home"
-        options={{ tabBarShowLabel: false }}
         component={HomeScreen}
-      ></Tab.Screen>
+        options={{
+          tabBarShowLabel: false,
+          tabBarIcon: ({ focused, color, size }) => (
+            <Ionicons
+              name={focused ? "home" : "home-outline"}
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
       <Tab.Screen
         name="Post"
-        options={{ tabBarShowLabel: false }}
         component={PostScreen}
-      ></Tab.Screen>
+        options={{
+          tabBarShowLabel: false,
+          tabBarIcon: ({ focused, color, size }) => (
+            <Ionicons
+              name={focused ? "add" : "add-outline"}
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
       <Tab.Screen
         name="Profile"
-        options={{ tabBarShowLabel: false }}
         component={ProfileScreen}
-      ></Tab.Screen>
+        options={{
+          tabBarShowLabel: false,
+          tabBarIcon: ({ focused, color, size }) => (
+            <Ionicons
+              name={focused ? "search" : "search-outline"}
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
     </Tab.Navigator>
   );
 }
