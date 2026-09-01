@@ -12,8 +12,8 @@ export class PostsService {
     },
   ];
 
-  findAll() {
-    return this.posts;
+  findAll(limit: number, offset: number) {
+    return this.posts.slice(offset, offset + limit);
   }
 
   create(data: { content: string }) {

@@ -15,18 +15,37 @@ type Post = {
   createdAt: string;
 };
 
+const LIMIT = 5;
+
 function HomeScreen({ navigation }: Props) {
   const [posts, setPosts] = useState<Post[]>([]);
+  const [offset, setOffset] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
 
   const fetchPosts = useCallback(async () => {
+    if (loading || !hasMore) {
+      return;
+    }
+
+    setLoading(true);
+
     try {
-      const data = await getPosts();
-      console.log("posts:", data);
-      setPosts(data);
+      const data = await getPosts(LIMIT, offset);
+
+      setPosts((currentPosts) => [...currentPosts, ...data]);
+
+      if (data.length < LIMIT) {
+        setHasMore(false);
+      } else {
+        setOffset((currentOffset) => currentOffset + LIMIT);
+      }
     } catch (error) {
       console.error("APIエラー:", error);
+    } finally {
+      setLoading(false);
     }
-  }, []);
+  }, [loading, hasMore, offset]);
 
   useFocusEffect(
     useCallback(() => {
@@ -41,7 +60,9 @@ function HomeScreen({ navigation }: Props) {
         : await likePost(post.id);
 
       setPosts((currentPosts) =>
-        currentPosts.map((item) => (item.id === post.id ? updatedPost : item)),
+        currentPosts.map((item) =>
+          item.id === post.id ? updatedPost : item,
+        ),
       );
     } catch (error) {
       console.error("いいねエラー:", error);
@@ -49,10 +70,13 @@ function HomeScreen({ navigation }: Props) {
   };
 
   return (
-    <View>
-      <Text>Home</Text>
+    <View style={{ flex: 1 }}>
+      <Text>タイムライン</Text>
 
-      <Button title="投稿する" onPress={() => navigation.navigate("Post")} />
+      <Button
+        title="投稿する"
+        onPress={() => navigation.navigate("Post")}
+      />
 
       <Button
         title="記録する"
@@ -74,6 +98,8 @@ function HomeScreen({ navigation }: Props) {
             />
           </View>
         )}
+        onEndReached={fetchPosts}
+        onEndReachedThreshold={0.5}
       />
     </View>
   );

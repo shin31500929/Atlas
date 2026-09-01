@@ -1,7 +1,12 @@
 import { apiClient } from "./client";
 
-export const getPosts = async () => {
-  const response = await apiClient.get("/posts");
+export const getPosts = async (limit: number, offset: number) => {
+  const response = await apiClient.get("/posts", {
+    params: {
+      limit,
+      offset,
+    },
+  });
 
   return response.data;
 };
