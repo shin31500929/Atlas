@@ -1,7 +1,7 @@
 import { useFocusEffect } from "@react-navigation/native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useCallback, useState } from "react";
-import { Button, FlatList, Text, View } from "react-native";
+import { Button, ScrollView, View } from "react-native";
 import { getPosts, likePost, unlikePost } from "../../api/posts";
 import HeaderComponent from "../../components/Header";
 import PostCard from "../../components/PostCard";
@@ -70,50 +70,43 @@ function HomeScreen({ navigation }: Props) {
   };
 
   const randomString = Math.random().toString(36).substring(2, 10);
-
   const randomUserId = `user_${Math.random().toString(36).substring(2, 8)}`;
 
   return (
     <View style={{ flex: 1 }}>
       <HeaderComponent title="TimeLine" />
-      <Text>タイムライン</Text>
 
-      <PostCard
-        userId={randomUserId}
-        content={randomString}
-        postedAt={new Date()}
-        postedImage={{
-        }}
-        likeCount={0}
-        liked={false}
-        onLike={() => console.log("いいねボタンが押されました")}
-      />
+      <ScrollView>
+        <PostCard
+          userId={randomUserId}
+          content={randomString}
+          postedAt={new Date()}
+          postedImage={{}}
+          likeCount={0}
+          liked={false}
+          onLike={() => console.log("いいねボタンが押されました")}
+        />
 
-      <Button title="投稿する" onPress={() => navigation.navigate("Post")} />
+        <PostCard
+          userId={randomUserId}
+          content={randomString}
+          postedAt={new Date()}
+          postedImage={{}}
+          likeCount={0}
+          liked={false}
+          onLike={() => console.log("いいねボタンが押されました")}
+        />
 
-      <Button
-        title="記録する"
-        onPress={() => navigation.navigate("Recording")}
-      />
+        <Button
+          title="投稿する"
+          onPress={() => navigation.navigate("Post")}
+        />
 
-      <FlatList
-        data={posts}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View>
-            <Text>{item.content}</Text>
-
-            <Text>いいね: {item.likeCount}</Text>
-
-            <Button
-              title={item.liked ? "いいね解除" : "いいね"}
-              onPress={() => handleLike(item)}
-            />
-          </View>
-        )}
-        onEndReached={fetchPosts}
-        onEndReachedThreshold={0.5}
-      />
+        <Button
+          title="記録する"
+          onPress={() => navigation.navigate("Recording")}
+        />
+      </ScrollView>
     </View>
   );
 }
