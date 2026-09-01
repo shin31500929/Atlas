@@ -1,6 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import HomeScreen from "../screens//home/HomeScreen";
+import HomeScreen from "../screens/home/HomeScreen";
 import PostScreen from "../screens/post/PostScreen";
 import ProfileScreen from "../screens/profile/ProfileScreen";
 // import SearchScreen from "../screens/search/SearchScreen";
@@ -14,7 +14,7 @@ function MainTabNavigator() {
   return (
     <Tab.Navigator
       screenOptions={{
-        tabBarPosition: dimensions.width >= 768 ? "left" : "bottom",
+        tabBarPosition: dimensions.width >= 500 ? "left" : "bottom",
       }}
     >
       <Tab.Screen
