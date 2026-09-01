@@ -3,6 +3,8 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useCallback, useState } from "react";
 import { Button, FlatList, Text, View } from "react-native";
 import { getPosts, likePost, unlikePost } from "../../api/posts";
+import HeaderComponent from "../../components/Header";
+import PostCard from "../../components/PostCard";
 import type RootStackParamList from "../../navigation/type";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Home">;
@@ -60,23 +62,34 @@ function HomeScreen({ navigation }: Props) {
         : await likePost(post.id);
 
       setPosts((currentPosts) =>
-        currentPosts.map((item) =>
-          item.id === post.id ? updatedPost : item,
-        ),
+        currentPosts.map((item) => (item.id === post.id ? updatedPost : item)),
       );
     } catch (error) {
       console.error("いいねエラー:", error);
     }
   };
 
+  const randomString = Math.random().toString(36).substring(2, 10);
+
+  const randomUserId = `user_${Math.random().toString(36).substring(2, 8)}`;
+
   return (
     <View style={{ flex: 1 }}>
+      <HeaderComponent title="TimeLine" />
       <Text>タイムライン</Text>
 
-      <Button
-        title="投稿する"
-        onPress={() => navigation.navigate("Post")}
+      <PostCard
+        userId={randomUserId}
+        content={randomString}
+        postedAt={new Date()}
+        postedImage={{
+        }}
+        likeCount={0}
+        liked={false}
+        onLike={() => console.log("いいねボタンが押されました")}
       />
+
+      <Button title="投稿する" onPress={() => navigation.navigate("Post")} />
 
       <Button
         title="記録する"

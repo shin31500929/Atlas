@@ -1,6 +1,6 @@
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import * as React from "react";
 import { Appbar } from "react-native-paper";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 type HeaderComponentProps = {
   title: string;
@@ -19,7 +19,15 @@ const HeaderComponent = ({
     {/* onBackPressが渡されてる画面だけ戻る矢印を出す */}
     {onBackPress && <Appbar.BackAction onPress={onBackPress} />}
 
-    <Appbar.Content title={title} />
+    <Appbar.Content
+      title={title}
+      titleStyle={{
+        textAlign: "center",
+        backgroundColor: "White",
+        color: "black",
+        fontSize: 18,
+      }}
+    />
 
     {/* iconNameとonIconPressが両方揃ってる時だけ右側アイコンを出す */}
     {iconName && onIconPress && (
