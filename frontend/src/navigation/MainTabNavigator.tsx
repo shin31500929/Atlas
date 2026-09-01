@@ -5,7 +5,7 @@ import PostScreen from "../screens/post/PostScreen";
 import ProfileScreen from "../screens/profile/ProfileScreen";
 // import SearchScreen from "../screens/search/SearchScreen";
 import { useWindowDimensions } from "react-native";
-import TabType from "./TabType";
+import type TabType from "./TabType";
 
 const Tab = createBottomTabNavigator<TabType>();
 
