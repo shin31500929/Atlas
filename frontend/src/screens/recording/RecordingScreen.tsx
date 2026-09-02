@@ -19,7 +19,7 @@ type RecordData = {
 };
 
 function RecordingScreen({ navigation }: Props) {
-  const [title] = useState('東京散策');
+  const [title] = useState('');
   const [records, setRecords] = useState<RecordData[]>([]);
   const [currentRecordId, setCurrentRecordId] = useState<string | null>(
     null,

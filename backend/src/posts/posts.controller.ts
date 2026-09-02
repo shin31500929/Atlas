@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { PostsService } from './posts.service';
 
 @Controller('posts')
@@ -6,8 +14,8 @@ export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Get()
-  findAll() {
-    return this.postsService.findAll();
+  findAll(@Query('limit') limit = '5', @Query('offset') offset = '0') {
+    return this.postsService.findAll(Number(limit), Number(offset));
   }
 
   @Post()

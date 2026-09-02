@@ -1,79 +1,101 @@
-import { useFocusEffect } from "@react-navigation/native";
-import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { useCallback, useState } from "react";
-import { Button, FlatList, Text, View } from "react-native";
-import { getPosts, likePost, unlikePost } from "../../api/posts";
-import type RootStackParamList from "../../navigation/type";
+import { useState } from "react";
+import { Button, FlatList, View } from "react-native";
 
-type Props = NativeStackScreenProps<RootStackParamList, "Home">;
+import HeaderComponent from "../../components/Header";
+import PostCard from "../../components/PostCard";
 
 type Post = {
   id: string;
+  userId: string;
   content: string;
+  createdAt: string;
   likeCount: number;
   liked: boolean;
-  createdAt: string;
 };
 
-function HomeScreen({ navigation }: Props) {
-  const [posts, setPosts] = useState<Post[]>([]);
+function createRandomPost(): Post {
+  return {
+    id: Math.random().toString(36).substring(2, 10),
+    userId: `user_${Math.random().toString(36).substring(2, 8)}`,
+    content: Math.random().toString(36).substring(2, 10),
+    createdAt: new Date().toISOString(),
+    likeCount: 0,
+    liked: false,
+  };
+}
 
-  const fetchPosts = useCallback(async () => {
-    try {
-      const data = await getPosts();
-      console.log("posts:", data);
-      setPosts(data);
-    } catch (error) {
-      console.error("APIエラー:", error);
-    }
-  }, []);
-
-  useFocusEffect(
-    useCallback(() => {
-      fetchPosts();
-    }, [fetchPosts]),
+function HomeScreen({ navigation }: any) {
+  // 最初に5件生成
+  const [posts, setPosts] = useState<Post[]>(() =>
+    Array.from({ length: 5 }, createRandomPost),
   );
 
-  const handleLike = async (post: Post) => {
-    try {
-      const updatedPost = post.liked
-        ? await unlikePost(post.id)
-        : await likePost(post.id);
+  // スクロール時に5件追加
+  const loadMorePosts = () => {
+    const newPosts = Array.from({ length: 5 }, createRandomPost);
 
-      setPosts((currentPosts) =>
-        currentPosts.map((item) => (item.id === post.id ? updatedPost : item)),
-      );
-    } catch (error) {
-      console.error("いいねエラー:", error);
-    }
+    setPosts((currentPosts) => [
+      ...currentPosts,
+      ...newPosts,
+    ]);
+  };
+
+  const handleLike = (id: string) => {
+    setPosts((currentPosts) =>
+      currentPosts.map((post) => {
+        if (post.id !== id) {
+          return post;
+        }
+
+        if (post.liked) {
+          return {
+            ...post,
+            liked: false,
+            likeCount: 0,
+          };
+        }
+
+        return {
+          ...post,
+          liked: true,
+          likeCount: 1,
+        };
+      }),
+    );
   };
 
   return (
-    <View>
-      <Text>Home</Text>
-
-      <Button title="投稿する" onPress={() => navigation.navigate("Post")} />
-
-      <Button
-        title="記録する"
-        onPress={() => navigation.navigate("Recording")}
-      />
+    <View style={{ flex: 1 }}>
+      <HeaderComponent title="TimeLine" />
 
       <FlatList
         data={posts}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View>
-            <Text>{item.content}</Text>
-
-            <Text>いいね: {item.likeCount}</Text>
+          <PostCard
+            userId={item.userId}
+            content={item.content}
+            postedAt={new Date(item.createdAt)}
+            likeCount={item.likeCount}
+            liked={item.liked}
+            onLike={() => handleLike(item.id)}
+          />
+        )}
+        onEndReached={loadMorePosts}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={
+          <View style={{ padding: 10 }}>
+            <Button
+              title="投稿する"
+              onPress={() => navigation.navigate("Post")}
+            />
 
             <Button
-              title={item.liked ? "いいね解除" : "いいね"}
-              onPress={() => handleLike(item)}
+              title="記録する"
+              onPress={() => navigation.navigate("Recording")}
             />
           </View>
-        )}
+        }
       />
     </View>
   );
