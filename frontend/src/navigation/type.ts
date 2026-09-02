@@ -1,6 +1,6 @@
 type RootStackParamList = {
   Login: undefined;
-  Home: undefined;
+  MainTabs: undefined;
   Post: undefined;
   Recording: undefined;
   Confirm: undefined;

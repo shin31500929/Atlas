@@ -13,7 +13,7 @@ function RootNavigator() {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="Home"
+        name="MainTabs"
         component={MainTabNavigator}
         options={{ headerShown: false }}
       />
