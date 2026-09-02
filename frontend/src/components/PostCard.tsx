@@ -38,7 +38,7 @@ type Props = {
   content: string;
   postedAt: Date;
   iconImage?: ImageSourcePropType;
-  postedImage: ImageSourcePropType;
+  postedImage?: ImageSourcePropType;
   likeCount: number;
   liked: boolean;
   onLike: () => void;

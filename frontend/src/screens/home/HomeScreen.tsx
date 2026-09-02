@@ -1,112 +1,102 @@
-import { useFocusEffect } from "@react-navigation/native";
-import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { useCallback, useState } from "react";
-import { Button, ScrollView, View } from "react-native";
-import { getPosts, likePost, unlikePost } from "../../api/posts";
+import { useState } from "react";
+import { Button, FlatList, View } from "react-native";
+
 import HeaderComponent from "../../components/Header";
 import PostCard from "../../components/PostCard";
-import type RootStackParamList from "../../navigation/type";
-
-type Props = NativeStackScreenProps<RootStackParamList, "Home">;
 
 type Post = {
   id: string;
+  userId: string;
   content: string;
+  createdAt: string;
   likeCount: number;
   liked: boolean;
-  createdAt: string;
 };
 
-const LIMIT = 5;
+function createRandomPost(): Post {
+  return {
+    id: Math.random().toString(36).substring(2, 10),
+    userId: `user_${Math.random().toString(36).substring(2, 8)}`,
+    content: Math.random().toString(36).substring(2, 10),
+    createdAt: new Date().toISOString(),
+    likeCount: 0,
+    liked: false,
+  };
+}
 
-function HomeScreen({ navigation }: Props) {
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [offset, setOffset] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-
-  const fetchPosts = useCallback(async () => {
-    if (loading || !hasMore) {
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const data = await getPosts(LIMIT, offset);
-
-      setPosts((currentPosts) => [...currentPosts, ...data]);
-
-      if (data.length < LIMIT) {
-        setHasMore(false);
-      } else {
-        setOffset((currentOffset) => currentOffset + LIMIT);
-      }
-    } catch (error) {
-      console.error("APIエラー:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [loading, hasMore, offset]);
-
-  useFocusEffect(
-    useCallback(() => {
-      fetchPosts();
-    }, [fetchPosts]),
+function HomeScreen({ navigation }: any) {
+  // 最初に5件生成
+  const [posts, setPosts] = useState<Post[]>(() =>
+    Array.from({ length: 5 }, createRandomPost),
   );
 
-  const handleLike = async (post: Post) => {
-    try {
-      const updatedPost = post.liked
-        ? await unlikePost(post.id)
-        : await likePost(post.id);
+  // スクロール時に5件追加
+  const loadMorePosts = () => {
+    const newPosts = Array.from({ length: 5 }, createRandomPost);
 
-      setPosts((currentPosts) =>
-        currentPosts.map((item) => (item.id === post.id ? updatedPost : item)),
-      );
-    } catch (error) {
-      console.error("いいねエラー:", error);
-    }
+    setPosts((currentPosts) => [
+      ...currentPosts,
+      ...newPosts,
+    ]);
   };
 
-  const randomString = Math.random().toString(36).substring(2, 10);
-  const randomUserId = `user_${Math.random().toString(36).substring(2, 8)}`;
+  const handleLike = (id: string) => {
+    setPosts((currentPosts) =>
+      currentPosts.map((post) => {
+        if (post.id !== id) {
+          return post;
+        }
+
+        if (post.liked) {
+          return {
+            ...post,
+            liked: false,
+            likeCount: 0,
+          };
+        }
+
+        return {
+          ...post,
+          liked: true,
+          likeCount: 1,
+        };
+      }),
+    );
+  };
 
   return (
     <View style={{ flex: 1 }}>
       <HeaderComponent title="TimeLine" />
 
-      <ScrollView>
-        <PostCard
-          userId={randomUserId}
-          content={randomString}
-          postedAt={new Date()}
-          postedImage={{}}
-          likeCount={0}
-          liked={false}
-          onLike={() => console.log("いいねボタンが押されました")}
-        />
+      <FlatList
+        data={posts}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <PostCard
+            userId={item.userId}
+            content={item.content}
+            postedAt={new Date(item.createdAt)}
+            likeCount={item.likeCount}
+            liked={item.liked}
+            onLike={() => handleLike(item.id)}
+          />
+        )}
+        onEndReached={loadMorePosts}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={
+          <View style={{ padding: 10 }}>
+            <Button
+              title="投稿する"
+              onPress={() => navigation.navigate("Post")}
+            />
 
-        <PostCard
-          userId={randomUserId}
-          content={randomString}
-          postedAt={new Date()}
-          postedImage={{}}
-          likeCount={0}
-          liked={false}
-          onLike={() => console.log("いいねボタンが押されました")}
-        />
-
-        <Button
-          title="投稿する"
-          onPress={() => navigation.navigate("Post")}
-        />
-
-        <Button
-          title="記録する"
-          onPress={() => navigation.navigate("Recording")}
-        />
-      </ScrollView>
+            <Button
+              title="記録する"
+              onPress={() => navigation.navigate("Recording")}
+            />
+          </View>
+        }
+      />
     </View>
   );
 }
