@@ -6,7 +6,12 @@ import {
   Param,
   Post,
   Query,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 import { PostsService } from './posts.service';
 
 @Controller('posts')
@@ -19,8 +24,22 @@ export class PostsController {
   }
 
   @Post()
-  create(@Body() body: { content: string }) {
-    return this.postsService.create(body);
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: diskStorage({
+        destination: './uploads/posts',
+        filename: (_req, file, callback) => {
+          const filename = `${Date.now()}${extname(file.originalname)}`;
+          callback(null, filename);
+        },
+      }),
+    }),
+  )
+  create(
+    @Body() body: { content: string },
+    @UploadedFile() image?: Express.Multer.File,
+  ) {
+    return this.postsService.create(body, image);
   }
 
   @Post(':id/likes')

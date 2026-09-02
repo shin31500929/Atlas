@@ -11,9 +11,29 @@ export const getPosts = async (limit: number, offset: number) => {
   return response.data;
 };
 
-export const createPost = async (content: string) => {
-  const response = await apiClient.post("/posts", {
-    content,
+export const createPost = async (
+  content: string,
+  imageUri: string | null,
+) => {
+  const formData = new FormData();
+
+  formData.append("content", content);
+
+  if (imageUri) {
+    const filename =
+      imageUri.split("/").pop() ?? "image.jpg";
+
+    formData.append("image", {
+      uri: imageUri,
+      name: filename,
+      type: "image/jpeg",
+    } as any);
+  }
+
+  const response = await apiClient.post("/posts", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
   });
 
   return response.data;

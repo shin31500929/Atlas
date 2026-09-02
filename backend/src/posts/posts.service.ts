@@ -1,11 +1,21 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 
+type Post = {
+  id: string;
+  content: string;
+  imagePath: string | null;
+  likeCount: number;
+  liked: boolean;
+  createdAt: string;
+};
+
 @Injectable()
 export class PostsService {
-  private posts = [
+  private posts: Post[] = [
     {
       id: '1',
       content: '東京を散策しました',
+      imagePath: null,
       likeCount: 0,
       liked: false,
       createdAt: new Date().toISOString(),
@@ -16,10 +26,11 @@ export class PostsService {
     return this.posts.slice(offset, offset + limit);
   }
 
-  create(data: { content: string }) {
-    const post = {
+  create(data: { content: string }, image?: Express.Multer.File) {
+    const post: Post = {
       id: String(this.posts.length + 1),
       content: data.content,
+      imagePath: image ? `/posts/${image.filename}` : null,
       likeCount: 0,
       liked: false,
       createdAt: new Date().toISOString(),
