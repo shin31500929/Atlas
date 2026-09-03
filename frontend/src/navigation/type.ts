@@ -1,13 +1,22 @@
+import type {
+  LatLng,
+  RecordingSession,
+  TripRecord,
+} from "../screens/recording/types";
+
 type RootStackParamList = {
   Login: undefined;
   MainTabs: undefined;
   Post: undefined;
-  Recording: undefined;
-  Confirm: undefined;
-  RecordingMap: undefined;
-  Profile: undefined;
-  Test: undefined;
-  Search: undefined;
+  DestinationSetup: undefined;
+  Recording:
+    | {
+        destination: LatLng;
+        startLocation?: LatLng;
+      }
+    | undefined;
+  Confirm: { session: RecordingSession };
+  RecordingMap: { trip?: TripRecord } | undefined;
 };
 
 export default RootStackParamList;

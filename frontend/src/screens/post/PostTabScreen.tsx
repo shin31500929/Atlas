@@ -1,21 +1,15 @@
 import { useState } from "react";
-import {
-  View,
-  TextInput,
-  Image,
-  StyleSheet,
-  Alert,
-} from "react-native";
+import { View, TextInput, Image, StyleSheet, Alert } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import Button from "../../components/Button";
-import type RootStackParamList from "../../navigation/type";
+import type TabParamList from "../../navigation/TabType";
 import { createPost } from "../../api/posts";
 import { COLORS } from "../recording/constants";
 
-type Props = NativeStackScreenProps<RootStackParamList, "Post">;
+type Props = BottomTabScreenProps<TabParamList, "Post">;
 
-function PostScreen({ navigation }: Props) {
+function PostTabScreen({ navigation }: Props) {
   const [content, setContent] = useState("");
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [posting, setPosting] = useState(false);
@@ -51,7 +45,7 @@ function PostScreen({ navigation }: Props) {
       setContent("");
       setImageUri(null);
       Alert.alert("投稿しました", "タイムラインに反映されます。");
-      navigation.goBack();
+      navigation.navigate("Home");
     } catch (error) {
       console.error("投稿エラー:", error);
       Alert.alert("投稿に失敗しました", "もう一度お試しください。");
@@ -128,4 +122,5 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PostScreen;
+export default PostTabScreen;
+
