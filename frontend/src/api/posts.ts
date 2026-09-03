@@ -20,33 +20,31 @@ export const createPost = async (
   formData.append("content", content);
 
   if (imageUri) {
+    const response = await fetch(imageUri);
+    const blob = await response.blob();
+
     const filename =
       imageUri.split("/").pop() ?? "image.jpg";
 
-    formData.append("image", {
-      uri: imageUri,
-      name: filename,
-      type: "image/jpeg",
-    } as any);
+    formData.append(
+      "image",
+      new File([blob], filename, {
+        type: blob.type || "image/jpeg",
+      }),
+    );
   }
 
-  const response = await apiClient.post("/posts", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+  const response = await apiClient.post("/posts", formData);
 
   return response.data;
 };
 
 export const likePost = async (postId: string) => {
   const response = await apiClient.post(`/posts/${postId}/likes`);
-
   return response.data;
 };
 
 export const unlikePost = async (postId: string) => {
   const response = await apiClient.delete(`/posts/${postId}/likes`);
-
   return response.data;
 };
