@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { ImageSourcePropType } from "react-native";
-import { Avatar, Button, Card, Text } from "react-native-paper";
+import { Avatar, Button, Card as PaperCard, Text } from "react-native-paper";
 
-function CalcDiffTime(PostedAt: Date) {
+function CalcDiffTime(postedAt: Date) {
   const options = {
     weekday: "short" as const,
     year: "numeric" as const,
@@ -11,26 +11,22 @@ function CalcDiffTime(PostedAt: Date) {
   };
 
   const now = new Date();
-  const CurrentTime = now.getTime();
-  const PostedAtTime = PostedAt.getTime();
+  const currentTime = now.getTime();
+  const postedAtTime = postedAt.getTime();
 
-  const diff_hh = Math.floor(
-    (CurrentTime - PostedAtTime) / (1000 * 60 * 60)
-  );
+  const diffHh = Math.floor((currentTime - postedAtTime) / (1000 * 60 * 60));
 
-  const diff_mm = Math.floor(
-    (CurrentTime - PostedAtTime) / (1000 * 60)
-  );
+  const diffMm = Math.floor((currentTime - postedAtTime) / (1000 * 60));
 
-  if (diff_hh >= 24) {
-    return PostedAt.toLocaleString("ja-JP", options);
+  if (diffHh >= 24) {
+    return postedAt.toLocaleString("ja-JP", options);
   }
 
-  if (diff_hh >= 1) {
-    return `${diff_hh}時間前`;
+  if (diffHh >= 1) {
+    return `${diffHh}時間前`;
   }
 
-  return `${diff_mm}分前`;
+  return `${diffMm}分前`;
 }
 
 type Props = {
@@ -38,45 +34,31 @@ type Props = {
   content: string;
   postedAt: Date;
   iconImage?: ImageSourcePropType;
-  postedImage?: ImageSourcePropType;
+  postedImage?: string | null;
   likeCount: number;
   liked: boolean;
   onLike: () => void;
 };
 
-const CardComponent = (props: Props) => {
-  // アバター画像を初回だけランダム生成
+const PostCard = (props: Props) => {
   const [randomAvatar] = useState(
-    `https://picsum.photos/100/100?random=${Math.random()}`
+    `https://picsum.photos/100/100?random=${Math.random()}`,
   );
 
-  // 投稿画像を初回だけランダム生成
-  const [randomPostImage] = useState(
-    `https://picsum.photos/700/400?random=${Math.random()}`
-  );
-
-  // Likeをローカルで管理
-  const [liked, setLiked] = useState(props.liked);
-  const [likeCount, setLikeCount] = useState(props.liked ? 1 : 0);
-
-  const handleLike = () => {
-    if (liked) {
-      setLiked(false);
-      setLikeCount(0);
-    } else {
-      setLiked(true);
-      setLikeCount(1);
-    }
-  };
+  const imageUri = props.postedImage
+    ? props.postedImage.startsWith("http")
+      ? props.postedImage
+      : `http://localhost:3000${props.postedImage}`
+    : null;
 
   return (
-    <Card
+    <PaperCard
       style={{
         backgroundColor: "transparent",
         marginVertical: 4,
       }}
     >
-      <Card.Title
+      <PaperCard.Title
         title={props.userId}
         subtitle={CalcDiffTime(props.postedAt)}
         titleStyle={{
@@ -89,11 +71,11 @@ const CardComponent = (props: Props) => {
           marginRight: 10,
           marginHorizontal: 0,
         }}
-        left={(ImageProps) => {
+        left={(imageProps) => {
           if (props.iconImage) {
             return (
               <Avatar.Image
-                {...ImageProps}
+                {...imageProps}
                 source={props.iconImage}
                 size={36}
               />
@@ -102,7 +84,7 @@ const CardComponent = (props: Props) => {
 
           return (
             <Avatar.Image
-              {...ImageProps}
+              {...imageProps}
               source={{
                 uri: randomAvatar,
               }}
@@ -112,17 +94,18 @@ const CardComponent = (props: Props) => {
         }}
       />
 
-      {/* 投稿画像 */}
-      <Card.Cover
-        source={{
-          uri: randomPostImage,
-        }}
-        style={{
-          height: 150,
-        }}
-      />
+      {imageUri && (
+        <PaperCard.Cover
+          source={{
+            uri: imageUri,
+          }}
+          style={{
+            height: 150,
+          }}
+        />
+      )}
 
-      <Card.Content
+      <PaperCard.Content
         style={{
           paddingVertical: 6,
         }}
@@ -136,20 +119,20 @@ const CardComponent = (props: Props) => {
         >
           {props.content}
         </Text>
-      </Card.Content>
+      </PaperCard.Content>
 
-      <Card.Actions
+      <PaperCard.Actions
         style={{
           paddingVertical: 0,
           minHeight: 40,
         }}
       >
-        <Button onPress={handleLike} compact>
-          {liked ? "♥" : "♡"} {likeCount}
+        <Button onPress={props.onLike} compact>
+          {props.liked ? "♥" : "♡"} {props.likeCount}
         </Button>
-      </Card.Actions>
-    </Card>
+      </PaperCard.Actions>
+    </PaperCard>
   );
 };
 
-export default CardComponent;
+export default PostCard;
