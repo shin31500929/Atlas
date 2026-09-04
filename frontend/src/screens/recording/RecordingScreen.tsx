@@ -1,125 +1,148 @@
-import { useEffect, useState } from 'react';
-import { View, Text, Button, FlatList } from 'react-native';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type RootStackParamList from '../../navigation/type';
+import { View, Text, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import Header from "../../components/Header";
+import type RootStackParamList from "../../navigation/type";
+import GpsStatusBadge from "./components/GpsStatusBadge";
+import RecordingControls from "./components/RecordingControls";
+import StatCard from "./components/StatCard";
+import { COLORS } from "./constants";
+import { useRecordingSession } from "./hooks/useRecordingSession";
+import { createRecord, endRecord } from "../../api/records";
 import {
-  createRecord,
-  endRecord,
-  getRecords,
-} from '../../api/records';
+  formatDistance,
+  formatElapsedTime,
+  formatSpeed,
+} from "./utils";
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Recording'>;
+type Props = NativeStackScreenProps<RootStackParamList, "Recording">;
 
-type RecordData = {
-  id: string;
-  title: string;
-  startedAt: string;
-  endedAt: string | null;
-  createdAt: string;
-};
+function RecordingScreen({ navigation, route }: Props) {
+  const { destination, startLocation } = route.params ?? {};
+  const { stats, gpsStatus, isPaused, pause, resume, stop } =
+    useRecordingSession({ destination, startLocation });
 
-function RecordingScreen({ navigation }: Props) {
-  const [title] = useState('');
-  const [records, setRecords] = useState<RecordData[]>([]);
-  const [currentRecordId, setCurrentRecordId] = useState<string | null>(
-    null,
-  );
+  const handleStop = async () => {
+    const session = stop();
 
-  // 記録一覧を取得
-  useEffect(() => {
-    const fetchRecords = async () => {
-      try {
-        const data = await getRecords();
-
-        console.log('records:', data);
-
-        setRecords(data);
-      } catch (error) {
-        console.error('記録取得エラー:', error);
-      }
-    };
-
-    fetchRecords();
-  }, []);
-
-  // 記録開始
-  const handleStartRecording = async () => {
+    // バックエンド API にも記録を保存（エラーでも画面遷移はする）
     try {
-      const startedAt = new Date().toISOString();
-
-      const newRecord = await createRecord(title, startedAt);
-
-      console.log('記録作成成功:', newRecord);
-
-      setCurrentRecordId(newRecord.id);
-
-      const data = await getRecords();
-      setRecords(data);
+      const record = await createRecord(
+        "移動記録",
+        session.startedAt ?? new Date().toISOString(),
+      );
+      await endRecord(record.id);
     } catch (error) {
-      console.error('記録作成エラー:', error);
-    }
-  };
-
-  // 記録終了
-  const handleEndRecording = async () => {
-    if (!currentRecordId) {
-      return;
+      console.error("記録API連携エラー:", error);
     }
 
-    try {
-      const endedRecord = await endRecord(currentRecordId);
-
-      console.log('記録終了成功:', endedRecord);
-
-      setCurrentRecordId(null);
-
-      const data = await getRecords();
-      setRecords(data);
-    } catch (error) {
-      console.error('記録終了エラー:', error);
-    }
+    navigation.navigate("Confirm", { session });
   };
 
   return (
-    <View
-      style={{
-        flex: 1,
-        padding: 20,
-      }}
-    >
-      <Text>Recording</Text>
+    <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
+      <Header title="記録中" iconName="cog" onIconPress={() => {}} />
 
-      <Text>{title}</Text>
+      <View style={styles.content}>
+        <GpsStatusBadge status={gpsStatus} />
 
-      {currentRecordId === null ? (
-        <Button
-          title="記録開始"
-          onPress={handleStartRecording}
+        <View style={styles.elapsedSection}>
+          <Text style={styles.elapsedTime}>
+            {formatElapsedTime(stats.elapsedMs)}
+          </Text>
+          <Text style={styles.elapsedLabel}>経過時間</Text>
+        </View>
+
+        <View style={styles.speedSection}>
+          <Text style={styles.speedLabel}>現在の速度</Text>
+          <Text style={styles.speedValue}>
+            {formatSpeed(stats.currentSpeedKmh)}
+          </Text>
+          <Text style={styles.speedUnit}>km/h</Text>
+        </View>
+
+        <View style={styles.statsRow}>
+          <StatCard
+            label="移動距離"
+            value={formatDistance(stats.distanceKm)}
+            unit="km"
+          />
+          <StatCard
+            label="最高速度"
+            value={formatSpeed(stats.maxSpeedKmh)}
+            unit="km/h"
+          />
+        </View>
+      </View>
+
+      <View style={styles.controls}>
+        <RecordingControls
+          isPaused={isPaused}
+          onPause={pause}
+          onResume={resume}
+          onStop={handleStop}
         />
-      ) : (
-        <Button
-          title="記録終了"
-          onPress={handleEndRecording}
-        />
-      )}
-
-      <Text>記録一覧</Text>
-
-      <FlatList
-        data={records}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View>
-            <Text>タイトル: {item.title}</Text>
-            <Text>開始: {item.startedAt}</Text>
-            <Text>
-              終了: {item.endedAt ?? '記録中'}
-            </Text>
-          </View>
-        )}
-      />
-    </View>
+      </View>
+    </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: COLORS.white,
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 24,
+    paddingTop: 8,
+    gap: 28,
+  },
+  elapsedSection: {
+    alignItems: "center",
+    marginTop: 8,
+  },
+  elapsedTime: {
+    fontSize: 48,
+    fontWeight: "700",
+    color: COLORS.text,
+    fontVariant: ["tabular-nums"],
+    letterSpacing: 1,
+  },
+  elapsedLabel: {
+    fontSize: 14,
+    color: COLORS.label,
+    marginTop: 6,
+  },
+  speedSection: {
+    alignItems: "center",
+  },
+  speedLabel: {
+    fontSize: 14,
+    color: COLORS.label,
+    marginBottom: 4,
+  },
+  speedValue: {
+    fontSize: 64,
+    fontWeight: "700",
+    color: COLORS.text,
+    fontVariant: ["tabular-nums"],
+    lineHeight: 72,
+  },
+  speedUnit: {
+    fontSize: 14,
+    color: COLORS.label,
+    marginTop: 2,
+  },
+  statsRow: {
+    flexDirection: "row",
+    gap: 12,
+    marginTop: 8,
+  },
+  controls: {
+    paddingBottom: 24,
+    paddingTop: 8,
+  },
+});
 
 export default RecordingScreen;

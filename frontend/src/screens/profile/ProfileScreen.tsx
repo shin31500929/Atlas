@@ -1,8 +1,8 @@
+import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { View, Text, Button } from "react-native";
-import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import type RootStackParamList from "../../navigation/type";
+import type TabParamList from "../../navigation/TabType";
 
-type Props = NativeStackScreenProps<RootStackParamList, "Profile">;
+type Props = BottomTabScreenProps<TabParamList, "Profile">;
 
 function ProfileScreen({ navigation }: Props) {
   return (
@@ -14,7 +14,6 @@ function ProfileScreen({ navigation }: Props) {
       }}
     >
       <Text>Profile</Text>
-    
     </View>
   );
 }

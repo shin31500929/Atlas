@@ -1,7 +1,7 @@
 type TabParamList = {
   Home: undefined;
-  Search: undefined;
   Post: undefined;
+  Recording: undefined;
   Profile: undefined;
 };
 
