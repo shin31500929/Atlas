@@ -1,14 +1,5 @@
-import Ionicons from "@expo/vector-icons/Ionicons";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import HomeScreen from "../screens/home/HomeScreen";
-import PostTabScreen from "../screens/post/PostTabScreen";
-import RecordingTabScreen from "../screens/recording/RecordingTabScreen";
-import ProfileScreen from "../screens/profile/ProfileScreen";
-import type TabParamList from "./TabType";
 import { useState } from "react";
 import { View, Text, Pressable } from "react-native";
-
-const Tab = createBottomTabNavigator<TabParamList>();
 
 function ProfileTabNavigator() {
   const [selectedTab, setSelectedTab] = useState("Post");
