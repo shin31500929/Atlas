@@ -1,19 +1,19 @@
 import { View, StyleProp, ViewStyle, Image } from "react-native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
-type ProfileIconProps = {
+type IconProps = {
   size?: number;
   imageUri?: string;
   backgroundColor?: string;
   style?: StyleProp<ViewStyle>;
 };
 
-const ProfileIcon = ({
+const Icon = ({
   size = 60,
   imageUri,
   backgroundColor = "#D9DEDC",
   style,
-}: ProfileIconProps) => {
+}: IconProps) => {
   return (
     <View
       style={[
@@ -48,4 +48,4 @@ const ProfileIcon = ({
   );
 };
 
-export default ProfileIcon;
+export default Icon;
