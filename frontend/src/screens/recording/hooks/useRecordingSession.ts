@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from "react";
 import * as Location from "expo-location";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { addRecordLocation, createRecord } from "../../../api/records";
 import type {
   GeoPoint,
   GpsStatus,
@@ -28,40 +29,106 @@ export function useRecordingSession(options: UseRecordingSessionOptions = {}) {
   const [route, setRoute] = useState<GeoPoint[]>([]);
   const [gpsStatus, setGpsStatus] = useState<GpsStatus>("idle");
   const [isPaused, setIsPaused] = useState(false);
+  const [recordId, setRecordId] = useState<string | null>(null);
 
   const routeRef = useRef<GeoPoint[]>([]);
   const statsRef = useRef<RecordingStats>(INITIAL_STATS);
   const isPausedRef = useRef(false);
+
   const watchRef = useRef<Location.LocationSubscription | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const syncTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
   const lastPointRef = useRef<GeoPoint | null>(null);
+  const latestPointRef = useRef<GeoPoint | null>(null);
+
   const startLocationRef = useRef<LatLng | undefined>(startLocation);
   const startedAtRef = useRef<string>(new Date().toISOString());
   const destinationRef = useRef<LatLng | undefined>(destination);
 
-  useEffect(() => {
-    destinationRef.current = destination;
-  }, [destination]);
+  const recordIdRef = useRef<string | null>(null);
 
-  useEffect(() => {
-    if (startLocation) {
-      startLocationRef.current = startLocation;
-    }
-  }, [startLocation]);
-
-  const syncStats = useCallback((updater: (prev: RecordingStats) => RecordingStats) => {
-    setStats((prev) => {
-      const next = updater(prev);
-      statsRef.current = next;
-      return next;
-    });
-  }, []);
+  const syncStats = useCallback(
+    (updater: (prev: RecordingStats) => RecordingStats) => {
+      setStats((prev) => {
+        const next = updater(prev);
+        statsRef.current = next;
+        return next;
+      });
+    },
+    [],
+  );
 
   const stopWatch = useCallback(async () => {
     if (watchRef.current) {
       watchRef.current.remove();
       watchRef.current = null;
     }
+  }, []);
+
+  const stopTimer = useCallback(() => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+  }, []);
+
+  const stopSyncTimer = useCallback(() => {
+    if (syncTimerRef.current) {
+      clearInterval(syncTimerRef.current);
+      syncTimerRef.current = null;
+    }
+  }, []);
+
+  const startTimer = useCallback(() => {
+    if (timerRef.current) {
+      return;
+    }
+
+    timerRef.current = setInterval(() => {
+      if (isPausedRef.current) {
+        return;
+      }
+
+      syncStats((prev) => ({
+        ...prev,
+        elapsedMs: prev.elapsedMs + 1000,
+      }));
+    }, 1000);
+  }, [syncStats]);
+
+  const startSyncTimer = useCallback(() => {
+    console.log("START SYNC TIMER");
+
+    if (syncTimerRef.current) {
+      console.log("既存のSYNC TIMERを停止");
+      clearInterval(syncTimerRef.current);
+      syncTimerRef.current = null;
+    }
+
+    syncTimerRef.current = setInterval(() => {
+      if (isPausedRef.current) {
+        return;
+      }
+
+      const currentRecordId = recordIdRef.current;
+      const latestPoint = latestPointRef.current;
+
+      if (!currentRecordId || !latestPoint) {
+        return;
+      }
+
+      console.log("GPS 10秒同期:", new Date().toISOString(), latestPoint);
+
+      addRecordLocation(
+        currentRecordId,
+        latestPoint.latitude,
+        latestPoint.longitude,
+        new Date(latestPoint.timestamp).toISOString(),
+      ).catch((error) => {
+        console.error("GPS送信エラー:", error);
+      });
+    }, 10000);
   }, []);
 
   const startWatch = useCallback(async () => {
@@ -84,6 +151,8 @@ export function useRecordingSession(options: UseRecordingSessionOptions = {}) {
           timestamp: location.timestamp,
         };
 
+        latestPointRef.current = point;
+
         if (!startLocationRef.current) {
           startLocationRef.current = {
             latitude: point.latitude,
@@ -100,6 +169,7 @@ export function useRecordingSession(options: UseRecordingSessionOptions = {}) {
         if (lastPointRef.current) {
           distanceDelta = haversineDistance(lastPointRef.current, point);
         }
+
         lastPointRef.current = point;
 
         syncStats((prev) => ({
@@ -114,38 +184,18 @@ export function useRecordingSession(options: UseRecordingSessionOptions = {}) {
     );
   }, [stopWatch, syncStats]);
 
-  const startTimer = useCallback(() => {
-    if (timerRef.current) {
-      return;
-    }
-
-    timerRef.current = setInterval(() => {
-      if (isPausedRef.current) {
-        return;
-      }
-
-      syncStats((prev) => ({
-        ...prev,
-        elapsedMs: prev.elapsedMs + 1000,
-      }));
-    }, 1000);
-  }, [syncStats]);
-
-  const stopTimer = useCallback(() => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-  }, []);
-
   useEffect(() => {
     let isMounted = true;
+
     startedAtRef.current = new Date().toISOString();
 
     const init = async () => {
+      console.log("INIT RECORDING SESSION");
+
       setGpsStatus("acquiring");
 
       const { status } = await Location.requestForegroundPermissionsAsync();
+
       if (!isMounted) {
         return;
       }
@@ -155,37 +205,78 @@ export function useRecordingSession(options: UseRecordingSessionOptions = {}) {
         return;
       }
 
-      await startWatch();
-      startTimer();
+      try {
+        const record = await createRecord("移動記録", startedAtRef.current);
+
+        if (!isMounted) {
+          return;
+        }
+
+        recordIdRef.current = record.id;
+        setRecordId(record.id);
+
+        await startWatch();
+
+        if (!isMounted) {
+          return;
+        }
+
+        startTimer();
+        startSyncTimer();
+      } catch (error) {
+        if (!isMounted) {
+          return;
+        }
+
+        console.error("Record作成エラー:", error);
+
+        await startWatch();
+
+        if (!isMounted) {
+          return;
+        }
+
+        startTimer();
+      }
     };
 
     init();
 
     return () => {
+      console.log("CLEANUP RECORDING SESSION");
+
       isMounted = false;
+
       stopWatch();
       stopTimer();
+      stopSyncTimer();
     };
-  }, [startWatch, startTimer, stopWatch, stopTimer]);
+  }, [
+    startWatch,
+    startTimer,
+    startSyncTimer,
+    stopWatch,
+    stopTimer,
+    stopSyncTimer,
+  ]);
 
-  const pause = useCallback(async () => {
+  const pause = useCallback(() => {
     isPausedRef.current = true;
     setIsPaused(true);
-    await stopWatch();
-  }, [stopWatch]);
+  }, []);
 
-  const resume = useCallback(async () => {
+  const resume = useCallback(() => {
     isPausedRef.current = false;
     setIsPaused(false);
-    await startWatch();
-    startTimer();
-  }, [startWatch, startTimer]);
+  }, []);
 
   const stop = useCallback((): RecordingSession => {
     isPausedRef.current = true;
     setIsPaused(true);
+
     stopWatch();
     stopTimer();
+    stopSyncTimer();
 
     return {
       ...statsRef.current,
@@ -196,13 +287,14 @@ export function useRecordingSession(options: UseRecordingSessionOptions = {}) {
       startedAt: startedAtRef.current,
       endedAt: new Date().toISOString(),
     };
-  }, [stopWatch, stopTimer]);
+  }, [stopWatch, stopTimer, stopSyncTimer]);
 
   return {
     stats,
     route,
     gpsStatus,
     isPaused,
+    recordId,
     pause,
     resume,
     stop,

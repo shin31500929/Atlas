@@ -8,7 +8,7 @@ import RecordingControls from "./components/RecordingControls";
 import StatCard from "./components/StatCard";
 import { COLORS } from "./constants";
 import { useRecordingSession } from "./hooks/useRecordingSession";
-import { createRecord, endRecord } from "../../api/records";
+import { endRecord } from "../../api/records";
 import {
   formatDistance,
   formatElapsedTime,
@@ -19,21 +19,30 @@ type Props = NativeStackScreenProps<RootStackParamList, "Recording">;
 
 function RecordingScreen({ navigation, route }: Props) {
   const { destination, startLocation } = route.params ?? {};
-  const { stats, gpsStatus, isPaused, pause, resume, stop } =
-    useRecordingSession({ destination, startLocation });
+
+  const {
+    stats,
+    gpsStatus,
+    isPaused,
+    recordId,
+    pause,
+    resume,
+    stop,
+  } = useRecordingSession({
+    destination,
+    startLocation,
+  });
 
   const handleStop = async () => {
     const session = stop();
 
-    // バックエンド API にも記録を保存（エラーでも画面遷移はする）
-    try {
-      const record = await createRecord(
-        "移動記録",
-        session.startedAt ?? new Date().toISOString(),
-      );
-      await endRecord(record.id);
-    } catch (error) {
-      console.error("記録API連携エラー:", error);
+    // 記録開始時に作成したRecordを終了する
+    if (recordId) {
+      try {
+        await endRecord(recordId);
+      } catch (error) {
+        console.error("記録終了API連携エラー:", error);
+      }
     }
 
     navigation.navigate("Confirm", { session });
@@ -146,3 +155,4 @@ const styles = StyleSheet.create({
 });
 
 export default RecordingScreen;
+

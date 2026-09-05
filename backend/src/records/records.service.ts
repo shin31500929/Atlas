@@ -8,6 +8,14 @@ type RecordData = {
   createdAt: string;
 };
 
+type LocationData = {
+  id: string;
+  recordId: string;
+  latitude: number;
+  longitude: number;
+  recordedAt: string;
+};
+
 @Injectable()
 export class RecordsService {
   private records: RecordData[] = [
@@ -20,11 +28,15 @@ export class RecordsService {
     },
   ];
 
+  private locations: LocationData[] = [];
+
   findAll() {
     return this.records;
   }
 
   create(data: { title: string; startedAt: string }) {
+    console.log('CREATE RECORD:', data);
+
     const record: RecordData = {
       id: String(this.records.length + 1),
       title: data.title,
@@ -39,6 +51,8 @@ export class RecordsService {
   }
 
   end(id: string) {
+    console.log('END RECORD:', id);
+
     const record = this.records.find((record) => record.id === id);
 
     if (!record) {
@@ -48,5 +62,38 @@ export class RecordsService {
     record.endedAt = new Date().toISOString();
 
     return record;
+  }
+
+  addLocation(
+    recordId: string,
+    data: {
+      latitude: number;
+      longitude: number;
+      recordedAt: string;
+    },
+  ) {
+    console.log('ADD LOCATION:', recordId, data);
+
+    const record = this.records.find((record) => record.id === recordId);
+
+    if (!record) {
+      return null;
+    }
+
+    const location: LocationData = {
+      id: String(this.locations.length + 1),
+      recordId,
+      latitude: data.latitude,
+      longitude: data.longitude,
+      recordedAt: data.recordedAt,
+    };
+
+    this.locations.push(location);
+
+    return location;
+  }
+
+  findLocations(recordId: string) {
+    return this.locations.filter((location) => location.recordId === recordId);
   }
 }
