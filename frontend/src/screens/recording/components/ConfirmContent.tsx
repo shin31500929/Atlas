@@ -28,7 +28,10 @@ type ConfirmContentProps = {
   onAddTag: () => void;
   onRemoveTag: (tag: string) => void;
   onPost: () => void;
+  /** 保存中 */
   posting?: boolean;
+  /** 保存済み（連打で二重に記録が増えないようボタンを止める） */
+  posted?: boolean;
 };
 
 function ConfirmContent({
@@ -42,7 +45,10 @@ function ConfirmContent({
   onRemoveTag,
   onPost,
   posting = false,
+  posted = false,
 }: ConfirmContentProps) {
+  const locked = posting || posted;
+
   return (
     <View style={styles.container}>
       <ScrollView
@@ -135,9 +141,11 @@ function ConfirmContent({
 
       <View style={styles.footer}>
         <Button
-          text={posting ? "保存中..." : "記録を確定する"}
-          onPress={onPost}
-          buttonColor={COLORS.primary}
+          text={
+            posted ? "保存しました" : posting ? "保存中..." : "記録を確定する"
+          }
+          onPress={locked ? () => {} : onPost}
+          buttonColor={locked ? COLORS.border : COLORS.primary}
           textColor={COLORS.white}
           style={styles.postButton}
         />
