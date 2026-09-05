@@ -6,8 +6,8 @@ import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import Button from "../../components/Button";
 import TripCard from "../recording/components/TripCard";
-import { COLORS } from "../recording/constants";
-import { getTrips } from "../recording/storage/tripStorage";
+import { COLORS, MOCK_TRIP } from "../recording/constants";
+import { getTrips, saveTrip } from "../recording/storage/tripStorage";
 import type { TripRecord } from "../recording/types";
 import type RootStackParamList from "../../navigation/type";
 import type TabParamList from "../../navigation/TabType";
@@ -16,6 +16,14 @@ type Props = CompositeScreenProps<
   BottomTabScreenProps<TabParamList, "Recording">,
   NativeStackScreenProps<RootStackParamList>
 >;
+
+async function ensureMockTrip(saved: TripRecord[]): Promise<TripRecord[]> {
+  if (saved.some((trip) => trip.id === MOCK_TRIP.id)) {
+    return saved;
+  }
+  await saveTrip(MOCK_TRIP);
+  return [MOCK_TRIP, ...saved];
+}
 
 function RecordingTabScreen({ navigation }: Props) {
   const [trips, setTrips] = useState<TripRecord[]>([]);
@@ -28,8 +36,9 @@ function RecordingTabScreen({ navigation }: Props) {
         setLoading(true);
         try {
           const saved = await getTrips();
+          const withMock = await ensureMockTrip(saved);
           if (active) {
-            setTrips(saved);
+            setTrips(withMock);
           }
         } finally {
           if (active) {

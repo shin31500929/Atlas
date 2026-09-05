@@ -91,7 +91,7 @@ function HomeScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
-      <HeaderComponent title="TimeLine" />
+      {/* <HeaderComponent title=""/> */}
 
       {loading ? (
         <View style={styles.center}>
@@ -104,14 +104,14 @@ function HomeScreen({ navigation }: Props) {
           contentContainerStyle={styles.listContent}
           ListHeaderComponent={
             <View style={styles.postButtonWrap}>
-              <Button
+              {/* <Button
                 text="投稿する"
                 onPress={() => navigation.navigate("Post")}
                 buttonColor={COLORS.primary}
                 textColor={COLORS.white}
                 iconName="pencil"
                 style={styles.postButton}
-              />
+              /> */}
             </View>
           }
           ListEmptyComponent={

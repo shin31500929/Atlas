@@ -15,7 +15,7 @@ type RootStackParamList = {
         startLocation?: LatLng;
       }
     | undefined;
-  Confirm: { session: RecordingSession };
+  Confirm: { session: RecordingSession; recordId?: string | null };
   RecordingMap: { trip?: TripRecord } | undefined;
 };
 

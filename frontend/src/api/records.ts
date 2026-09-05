@@ -23,3 +23,35 @@ export const endRecord = async (id: string) => {
 
   return response.data;
 };
+
+export const updateRecordDetails = async (
+  id: string,
+  data: {
+    story?: string | null;
+    tags?: string[];
+  },
+) => {
+  const response = await apiClient.patch(`/records/${id}/details`, data);
+
+  return response.data;
+};
+
+//GPS送信用関数↓
+
+export const addRecordLocation = async (
+  recordId: string,
+  latitude: number,
+  longitude: number,
+  recordedAt: string,
+) => {
+  const response = await apiClient.post(
+    `/records/${recordId}/locations`,
+    {
+      latitude,
+      longitude,
+      recordedAt,
+    },
+  );
+
+  return response.data;
+};

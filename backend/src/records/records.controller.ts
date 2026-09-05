@@ -19,4 +19,34 @@ export class RecordsController {
   end(@Param('id') id: string) {
     return this.recordsService.end(id);
   }
+
+  @Patch(':id/details')
+  updateDetails(
+    @Param('id') id: string,
+    @Body()
+    body: {
+      story?: string | null;
+      tags?: string[];
+    },
+  ) {
+    return this.recordsService.updateDetails(id, body);
+  }
+
+  @Post(':id/locations')
+  addLocation(
+    @Param('id') id: string,
+    @Body()
+    body: {
+      latitude: number;
+      longitude: number;
+      recordedAt: string;
+    },
+  ) {
+    return this.recordsService.addLocation(id, body);
+  }
+
+  @Get(':id/locations')
+  findLocations(@Param('id') id: string) {
+    return this.recordsService.findLocations(id);
+  }
 }

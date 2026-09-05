@@ -6,6 +6,7 @@ type DestinationSetupMapProps = {
   currentLocation: LatLng | null;
   destination: LatLng | null;
   onSelectDestination: (coord: LatLng) => void;
+  showDeviceUserLocation?: boolean;
 };
 
 function DestinationSetupMap({
