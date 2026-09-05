@@ -3,8 +3,8 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { useWindowDimensions } from "react-native";
 import HomeScreen from "../screens/home/HomeScreen";
 import PostTabScreen from "../screens/post/PostTabScreen";
-import RecordingTabScreen from "../screens/recording/RecordingTabScreen";
 import ProfileScreen from "../screens/profile/ProfileScreen";
+import RecordingTabScreen from "../screens/recording/RecordingTabScreen";
 import type TabParamList from "./TabType";
 
 const Tab = createBottomTabNavigator<TabParamList>();
@@ -48,21 +48,6 @@ function MainTabNavigator() {
         }}
       />
       <Tab.Screen
-        name="Profile"
-        component={ProfileScreen}
-        options={{
-          title: "プロフィール",
-          tabBarShowLabel: false,
-          tabBarIcon: ({ focused, color, size }) => (
-            <Ionicons
-              name={focused ? "person-circle" : "person-circle-outline"}
-              size={size}
-              color={color}
-            />
-          ),
-        }}
-      />
-      <Tab.Screen
         name="Recording"
         component={RecordingTabScreen}
         options={{
@@ -71,6 +56,21 @@ function MainTabNavigator() {
           tabBarIcon: ({ focused, color, size }) => (
             <Ionicons
               name={focused ? "navigate" : "navigate-outline"}
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{
+          title: "プロフィール",
+          tabBarShowLabel: false,
+          tabBarIcon: ({ focused, color, size }) => (
+            <Ionicons
+              name={focused ? "person-circle" : "person-circle-outline"}
               size={size}
               color={color}
             />
