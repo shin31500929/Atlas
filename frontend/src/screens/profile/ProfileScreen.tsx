@@ -7,6 +7,7 @@ import CardComponent from "../../components/Card";
 import FooterComponent from "@/components/Footer";
 import ButtonComponent from "@/components/Button";
 import PostComponent from "@/components/PostCard";
+import ProfileTab from "../../navigation/Profiletab";
 
 type Props = BottomTabScreenProps<TabParamList, "Profile">;
 
@@ -64,6 +65,7 @@ function ProfileScreen({ navigation }: Props) {
           buttonColor="#138581"
         />
       </View>
+      
 
       <View
         style={{
@@ -89,6 +91,8 @@ function ProfileScreen({ navigation }: Props) {
           <text style={{ textAlign: "center" }}>km</text>
         </View>
 
+        
+
         <View
           style={{
             width: "45%",
@@ -104,53 +108,9 @@ function ProfileScreen({ navigation }: Props) {
           <text style={{ textAlign: "center" }}>km/h</text>
         </View>
       </View>
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          width: "100%",
-          paddingHorizontal: 20,
-          marginTop: 5,
-        }}
-      >
-        <View
-          style={{
-            width: "30%",
-            height: 45,
-            borderColor: "#8f9995",
-            borderWidth: 1,
-            borderRadius: 10,
-            padding: 10,
-          }}
-        >
-          <Text style={{ textAlign: "center" }}>投稿</Text>
-        </View>
 
-        <View
-          style={{
-            width: "30%",
-            height: 45,
-            borderColor: "#8f9995",
-            borderWidth: 1,
-            borderRadius: 10,
-            padding: 10,
-          }}
-        >
-          <Text style={{ textAlign: "center" }}>いいね</Text>
-        </View>
-        <View
-          style={{
-            width: "30%",
-            height: 45,
-            borderColor: "#8f9995",
-            borderWidth: 1,
-            borderRadius: 10,
-            padding: 10,
-          }}
-        >
-          <Text style={{ textAlign: "center" }}>保存済み</Text>
-        </View>
-      </View>
+      <ProfileTab/>
+      
       <View>
         <FooterComponent>
 
