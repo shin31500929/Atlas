@@ -1,5 +1,5 @@
 import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
-import { View, Text, Button } from "react-native";
+import { View, Text } from "react-native";
 import type TabParamList from "../../navigation/TabType";
 import Iconcomponent from "../../components/Icon";
 import HeaderComponent from "../../components/Header";
@@ -86,7 +86,7 @@ function ProfileScreen({ navigation }: Props) {
         >
           <Text style={{ textAlign: "center" }}>総移動距離</Text>
           <Text style={{ textAlign: "center", fontSize: 30 }}>0.0</Text>
-          <text style={{ textAlign: "center" }}>km</text>
+          <Text style={{ textAlign: "center" }}>km</Text>
         </View>
 
         <View
@@ -151,11 +151,7 @@ function ProfileScreen({ navigation }: Props) {
           <Text style={{ textAlign: "center" }}>保存済み</Text>
         </View>
       </View>
-      <View>
-        <FooterComponent>
-
-        </FooterComponent>
-      </View>
+      <FooterComponent />
           
     </View>
   );
