@@ -19,8 +19,8 @@ function ProfileScreen({ navigation }: Props) {
           title=""
           style={{ backgroundColor: "transparent", elevation: 0 }}
           onBackPress={() => navigation.goBack()}
-          iconName="dots-vertical"
-          onIconPress={() => console.log("Icon pressed")}
+          //iconName="dots-vertical"
+          //onIconPress={() => console.log("Icon pressed")}
         />
       </View>
 

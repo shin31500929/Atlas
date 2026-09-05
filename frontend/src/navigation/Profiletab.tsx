@@ -20,23 +20,24 @@ function ProfileTabNavigator() {
         style={{
           flexDirection: "row",
           justifyContent: "space-around",
+          padding: 50,
         }}
       >
         <Pressable onPress={() => setSelectedTab("Post")}>
-          <Text style={{ color: selectedTab === "Post" ? "#4943fb" : "black" }}>
+          <Text style={{ fontSize: 20, color: selectedTab === "Post" ? "#4943fb" : "black" }}>
             投稿
           </Text>
         </Pressable>
 
         <Pressable onPress={() => setSelectedTab("Like")}>
-          <Text style={{ color: selectedTab === "Like" ? "#4943fb" : "black" }}>
+          <Text style={{ fontSize: 20, color: selectedTab === "Like" ? "#4943fb" : "black" }}>
             いいね
           </Text>
         </Pressable>
 
         <Pressable onPress={() => setSelectedTab("Recording")}>
           <Text
-            style={{ color: selectedTab === "Recording" ? "#4943fb" : "black" }}
+            style={{ fontSize: 20, color: selectedTab === "Recording" ? "#4943fb" : "black" }}
           >
             記録
           </Text>
