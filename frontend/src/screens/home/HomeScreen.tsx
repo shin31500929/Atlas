@@ -8,7 +8,7 @@ import HeaderComponent from "../../components/Header";
 import PostCard from "../../components/PostCard";
 import Button from "../../components/Button";
 import { COLORS } from "../recording/constants";
-import { getPosts } from "../../api/posts";
+import { getPosts, type PostTrip } from "../../api/posts";
 import type RootStackParamList from "../../navigation/type";
 import type TabParamList from "../../navigation/TabType";
 
@@ -25,6 +25,7 @@ type Post = {
   createdAt: string;
   likeCount: number;
   liked: boolean;
+  trip: PostTrip | null;
 };
 
 function HomeScreen({ navigation }: Props) {
@@ -52,6 +53,7 @@ function HomeScreen({ navigation }: Props) {
               createdAt: p.createdAt,
               likeCount: p.likeCount ?? 0,
               liked: p.liked ?? false,
+              trip: p.trip ?? null,
             }))
             .sort(
               (a: Post, b: Post) =>
@@ -125,6 +127,15 @@ function HomeScreen({ navigation }: Props) {
               postedImage={item.imagePath}
               likeCount={item.likeCount}
               liked={item.liked}
+              trip={item.trip}
+              onOpenTrip={
+                item.trip?.recordId
+                  ? () =>
+                      navigation.navigate("RecordingMap", {
+                        recordId: item.trip?.recordId ?? undefined,
+                      })
+                  : undefined
+              }
               onLike={() => handleLike(item.id)}
             />
           )}

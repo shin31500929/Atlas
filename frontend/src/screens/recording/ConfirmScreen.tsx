@@ -14,6 +14,8 @@ import ConfirmContent from "./components/ConfirmContent";
 import { COLORS } from "./constants";
 import { saveTrip } from "./storage/tripStorage";
 import { updateRecordDetails } from "../../api/records";
+import { createTripPost } from "../../api/posts";
+import { formatDistance } from "./utils";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Confirm">;
 
@@ -30,6 +32,34 @@ type DialogState = {
   goHomeOnClose: boolean;
 };
 
+/** 保存結果のダイアログ本文を組み立てる */
+function buildResultMessage(params: {
+  recordId: string | null;
+  backendFailed: boolean;
+  shared: boolean;
+  timelineFailed: boolean;
+}): string {
+  const lines: string[] = [];
+
+  lines.push(
+    params.recordId && !params.backendFailed
+      ? "ストーリー・タグを含めてバックエンドと記録タブに保存しました。"
+      : params.backendFailed
+        ? "記録タブに保存しました。（ストーリー・タグのサーバー保存には失敗しました）"
+        : "記録タブに保存しました。",
+  );
+
+  if (params.shared) {
+    lines.push(
+      params.timelineFailed
+        ? "タイムラインへの投稿には失敗しました。"
+        : "タイムラインにも投稿しました。",
+    );
+  }
+
+  return lines.join("\n");
+}
+
 function normalizeTag(raw: string): string | null {
   const cleaned = raw.trim().replace(/^#+/, "").trim();
   return cleaned.length > 0 ? cleaned : null;
@@ -43,6 +73,8 @@ function ConfirmScreen({ navigation, route }: Props) {
   const [story, setStory] = useState(session.story ?? "");
   const [tags, setTags] = useState<string[]>(session.tags ?? []);
   const [tagInput, setTagInput] = useState("");
+  // タイムラインへの投稿は、本人が明示的にONにしたときだけ
+  const [shareToTimeline, setShareToTimeline] = useState(false);
 
   // 確定に成功したあと、連打で同じ記録が何件も増えるのを防ぐ
   const submittedRef = useRef(false);
@@ -111,6 +143,8 @@ function ConfirmScreen({ navigation, route }: Props) {
 
     // バックエンドへの story/タグ保存が失敗しても、記録タブへの保存は続ける
     let backendFailed = false;
+    // タイムラインへの投稿だけ失敗しても、記録自体は保存済みにする
+    let timelineFailed = false;
 
     try {
       if (recordId) {
@@ -126,6 +160,9 @@ function ConfirmScreen({ navigation, route }: Props) {
       }
 
       await saveTrip({
+        // サーバーの記録IDをそのまま使う。
+        // 別IDを振ると、同じ移動がサーバー側とキャッシュ側で別物として扱われる。
+        id: recordId ?? undefined,
         startLocation: {
           latitude: startLocation.latitude,
           longitude: startLocation.longitude,
@@ -144,15 +181,37 @@ function ConfirmScreen({ navigation, route }: Props) {
         tags: finalTags,
       });
 
+      if (shareToTimeline) {
+        try {
+          await createTripPost(
+            finalStory.length > 0
+              ? finalStory
+              : `${formatDistance(session.distanceKm)} km の移動を記録しました`,
+            {
+              recordId: recordId ?? null,
+              distanceKm: session.distanceKm,
+              maxSpeedKmh: session.maxSpeedKmh,
+              elapsedMs: session.elapsedMs,
+              startedAt,
+              tags: finalTags,
+            },
+          );
+        } catch (error) {
+          timelineFailed = true;
+          console.error("タイムラインへの投稿エラー:", error);
+        }
+      }
+
       submittedRef.current = true;
       setPosted(true);
       setDialog({
         title: "記録に保存しました",
-        message: backendFailed
-          ? "記録タブに保存しました。（ストーリー・タグのサーバー保存には失敗しました）"
-          : recordId
-            ? "ストーリー・タグを含めてバックエンドと記録タブに保存しました。"
-            : "記録タブに保存しました。",
+        message: buildResultMessage({
+          recordId: recordId ?? null,
+          backendFailed,
+          shared: shareToTimeline,
+          timelineFailed,
+        }),
         goHomeOnClose: true,
       });
     } catch (error) {
@@ -190,6 +249,8 @@ function ConfirmScreen({ navigation, route }: Props) {
           onPost={handlePost}
           posting={saving}
           posted={posted}
+          shareToTimeline={shareToTimeline}
+          onToggleShareToTimeline={setShareToTimeline}
         />
       </View>
 
