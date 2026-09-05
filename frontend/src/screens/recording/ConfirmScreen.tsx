@@ -1,15 +1,64 @@
-import { useState } from "react";
-import { View, Text, Pressable, StyleSheet, Alert } from "react-native";
+import { useRef, useState } from "react";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Appbar } from "react-native-paper";
+import {
+  Appbar,
+  Button as PaperButton,
+  Dialog,
+  Portal,
+  Text as PaperText,
+} from "react-native-paper";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type RootStackParamList from "../../navigation/type";
 import ConfirmContent from "./components/ConfirmContent";
 import { COLORS } from "./constants";
 import { saveTrip } from "./storage/tripStorage";
 import { updateRecordDetails } from "../../api/records";
+import { createTripPost } from "../../api/posts";
+import { formatDistance } from "./utils";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Confirm">;
+
+/**
+ * 結果の知らせ方について:
+ * React Native の Alert は Web (react-native-web) では実装がなく、呼んでも何も起きない。
+ * Alert の OK に画面遷移をぶら下げると、Web では「ボタンを押しても無反応」になる。
+ * react-native-paper の Dialog は iOS / Android / Web すべてで動くのでこちらを使う。
+ */
+type DialogState = {
+  title: string;
+  message: string;
+  /** OK を押したときに記録タブ（ホーム）まで戻るか */
+  goHomeOnClose: boolean;
+};
+
+/** 保存結果のダイアログ本文を組み立てる */
+function buildResultMessage(params: {
+  recordId: string | null;
+  backendFailed: boolean;
+  shared: boolean;
+  timelineFailed: boolean;
+}): string {
+  const lines: string[] = [];
+
+  lines.push(
+    params.recordId && !params.backendFailed
+      ? "ストーリー・タグを含めてバックエンドと記録タブに保存しました。"
+      : params.backendFailed
+        ? "記録タブに保存しました。（ストーリー・タグのサーバー保存には失敗しました）"
+        : "記録タブに保存しました。",
+  );
+
+  if (params.shared) {
+    lines.push(
+      params.timelineFailed
+        ? "タイムラインへの投稿には失敗しました。"
+        : "タイムラインにも投稿しました。",
+    );
+  }
+
+  return lines.join("\n");
+}
 
 function normalizeTag(raw: string): string | null {
   const cleaned = raw.trim().replace(/^#+/, "").trim();
@@ -19,12 +68,28 @@ function normalizeTag(raw: string): string | null {
 function ConfirmScreen({ navigation, route }: Props) {
   const { session, recordId } = route.params;
   const [saving, setSaving] = useState(false);
+  const [posted, setPosted] = useState(false);
+  const [dialog, setDialog] = useState<DialogState | null>(null);
   const [story, setStory] = useState(session.story ?? "");
   const [tags, setTags] = useState<string[]>(session.tags ?? []);
   const [tagInput, setTagInput] = useState("");
+  // タイムラインへの投稿は、本人が明示的にONにしたときだけ
+  const [shareToTimeline, setShareToTimeline] = useState(false);
+
+  // 確定に成功したあと、連打で同じ記録が何件も増えるのを防ぐ
+  const submittedRef = useRef(false);
 
   const handleEdit = () => {
     navigation.goBack();
+  };
+
+  const closeDialog = () => {
+    const goHome = dialog?.goHomeOnClose ?? false;
+    setDialog(null);
+
+    if (goHome) {
+      navigation.popToTop();
+    }
   };
 
   const handleAddTag = () => {
@@ -46,7 +111,7 @@ function ConfirmScreen({ navigation, route }: Props) {
   };
 
   const handlePost = async () => {
-    if (saving) {
+    if (saving || submittedRef.current) {
       return;
     }
 
@@ -66,14 +131,21 @@ function ConfirmScreen({ navigation, route }: Props) {
     const endedAt = session.endedAt ?? new Date().toISOString();
 
     if (!startLocation || !goalLocation) {
-      Alert.alert(
-        "保存できません",
-        "開始位置または目的地が不足しています。",
-      );
+      setDialog({
+        title: "保存できません",
+        message: "開始位置または目的地が不足しています。",
+        goHomeOnClose: false,
+      });
       return;
     }
 
     setSaving(true);
+
+    // バックエンドへの story/タグ保存が失敗しても、記録タブへの保存は続ける
+    let backendFailed = false;
+    // タイムラインへの投稿だけ失敗しても、記録自体は保存済みにする
+    let timelineFailed = false;
+
     try {
       if (recordId) {
         try {
@@ -82,15 +154,15 @@ function ConfirmScreen({ navigation, route }: Props) {
             tags: finalTags,
           });
         } catch (error) {
+          backendFailed = true;
           console.error("ストーリー/タグ保存エラー:", error);
-          Alert.alert(
-            "バックエンドへの保存に失敗しました",
-            "ローカルには保存します。",
-          );
         }
       }
 
       await saveTrip({
+        // サーバーの記録IDをそのまま使う。
+        // 別IDを振ると、同じ移動がサーバー側とキャッシュ側で別物として扱われる。
+        id: recordId ?? undefined,
         startLocation: {
           latitude: startLocation.latitude,
           longitude: startLocation.longitude,
@@ -109,20 +181,46 @@ function ConfirmScreen({ navigation, route }: Props) {
         tags: finalTags,
       });
 
-      Alert.alert(
-        "保存しました",
-        recordId
-          ? "ストーリー・タグを含めてバックエンドと記録タブに保存しました。"
-          : "記録タブに保存しました。",
-        [
-          {
-            text: "OK",
-            onPress: () => navigation.popToTop(),
-          },
-        ],
-      );
-    } catch {
-      Alert.alert("保存に失敗しました", "もう一度お試しください。");
+      if (shareToTimeline) {
+        try {
+          await createTripPost(
+            finalStory.length > 0
+              ? finalStory
+              : `${formatDistance(session.distanceKm)} km の移動を記録しました`,
+            {
+              recordId: recordId ?? null,
+              distanceKm: session.distanceKm,
+              maxSpeedKmh: session.maxSpeedKmh,
+              elapsedMs: session.elapsedMs,
+              startedAt,
+              tags: finalTags,
+            },
+          );
+        } catch (error) {
+          timelineFailed = true;
+          console.error("タイムラインへの投稿エラー:", error);
+        }
+      }
+
+      submittedRef.current = true;
+      setPosted(true);
+      setDialog({
+        title: "記録に保存しました",
+        message: buildResultMessage({
+          recordId: recordId ?? null,
+          backendFailed,
+          shared: shareToTimeline,
+          timelineFailed,
+        }),
+        goHomeOnClose: true,
+      });
+    } catch (error) {
+      console.error("記録の保存エラー:", error);
+      setDialog({
+        title: "保存に失敗しました",
+        message: "もう一度お試しください。",
+        goHomeOnClose: false,
+      });
     } finally {
       setSaving(false);
     }
@@ -150,8 +248,23 @@ function ConfirmScreen({ navigation, route }: Props) {
           onRemoveTag={handleRemoveTag}
           onPost={handlePost}
           posting={saving}
+          posted={posted}
+          shareToTimeline={shareToTimeline}
+          onToggleShareToTimeline={setShareToTimeline}
         />
       </View>
+
+      <Portal>
+        <Dialog visible={dialog !== null} onDismiss={closeDialog}>
+          <Dialog.Title>{dialog?.title ?? ""}</Dialog.Title>
+          <Dialog.Content>
+            <PaperText variant="bodyMedium">{dialog?.message ?? ""}</PaperText>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <PaperButton onPress={closeDialog}>OK</PaperButton>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
     </SafeAreaView>
   );
 }

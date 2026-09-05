@@ -16,7 +16,11 @@ type RootStackParamList = {
       }
     | undefined;
   Confirm: { session: RecordingSession; recordId?: string | null };
-  RecordingMap: { trip?: TripRecord } | undefined;
+  /**
+   * trip をそのまま渡すか、recordId だけ渡して画面側で取り直すかの2通り。
+   * 記録タブからは trip、タイムラインの投稿からは recordId で開く。
+   */
+  RecordingMap: { trip?: TripRecord; recordId?: string } | undefined;
 };
 
 export default RootStackParamList;

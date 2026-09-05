@@ -48,3 +48,26 @@ export const unlikePost = async (postId: string) => {
   const response = await apiClient.delete(`/posts/${postId}/likes`);
   return response.data;
 };
+
+// 移動記録からタイムラインに投稿する用 ↓
+
+/** 投稿に紐づく移動記録のサマリ（backend/src/posts/posts.service.ts と対応） */
+export type PostTrip = {
+  recordId: string | null;
+  distanceKm: number;
+  maxSpeedKmh: number;
+  elapsedMs: number;
+  /** ISO 8601 */
+  startedAt: string;
+  tags: string[];
+};
+
+/**
+ * 移動記録をタイムラインに投稿する。
+ * 画像は付けないので FormData ではなく JSON で送る。
+ */
+export const createTripPost = async (content: string, trip: PostTrip) => {
+  const response = await apiClient.post("/posts", { content, trip });
+
+  return response.data;
+};

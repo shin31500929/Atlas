@@ -7,7 +7,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import Button from "../../components/Button";
 import TripCard from "../recording/components/TripCard";
 import { COLORS, MOCK_TRIP } from "../recording/constants";
-import { getTrips, saveTrip } from "../recording/storage/tripStorage";
+import { listTripRecords } from "../recording/repository/tripRepository";
 import type { TripRecord } from "../recording/types";
 import type RootStackParamList from "../../navigation/type";
 import type TabParamList from "../../navigation/TabType";
@@ -17,17 +17,19 @@ type Props = CompositeScreenProps<
   NativeStackScreenProps<RootStackParamList>
 >;
 
-async function ensureMockTrip(saved: TripRecord[]): Promise<TripRecord[]> {
-  if (saved.some((trip) => trip.id === MOCK_TRIP.id)) {
-    return saved;
-  }
-  await saveTrip(MOCK_TRIP);
-  return [MOCK_TRIP, ...saved];
+/**
+ * サンプルの箱根カードは常に一覧の一番下に置く。
+ * 昔はストレージに書き込んでいたが、サーバーから取った一覧と二重に出てしまうので
+ * 表示のときだけ足す形にした（保存はしない）。
+ */
+function withSampleTrip(trips: TripRecord[]): TripRecord[] {
+  return [...trips.filter((trip) => trip.id !== MOCK_TRIP.id), MOCK_TRIP];
 }
 
 function RecordingTabScreen({ navigation }: Props) {
   const [trips, setTrips] = useState<TripRecord[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fromServer, setFromServer] = useState(true);
 
   useFocusEffect(
     useCallback(() => {
@@ -35,10 +37,10 @@ function RecordingTabScreen({ navigation }: Props) {
       const load = async () => {
         setLoading(true);
         try {
-          const saved = await getTrips();
-          const withMock = await ensureMockTrip(saved);
+          const result = await listTripRecords();
           if (active) {
-            setTrips(withMock);
+            setTrips(withSampleTrip(result.trips));
+            setFromServer(result.fromServer);
           }
         } finally {
           if (active) {
@@ -66,7 +68,12 @@ function RecordingTabScreen({ navigation }: Props) {
         />
       </View>
 
-      <Text style={styles.sectionTitle}>移動記録</Text>
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>移動記録</Text>
+        {!loading && !fromServer ? (
+          <Text style={styles.offlineBadge}>オフライン表示</Text>
+        ) : null}
+      </View>
 
       {loading ? (
         <View style={styles.center}>
@@ -103,12 +110,21 @@ const styles = StyleSheet.create({
   button: {
     width: "100%",
   },
+  sectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    marginBottom: 8,
+  },
   sectionTitle: {
     fontSize: 16,
     fontWeight: "700",
     color: COLORS.text,
-    paddingHorizontal: 16,
-    marginBottom: 8,
+  },
+  offlineBadge: {
+    fontSize: 12,
+    color: COLORS.stop,
   },
   center: {
     flex: 1,

@@ -7,6 +7,7 @@ import {
   ScrollView,
   StyleSheet,
 } from "react-native";
+import { Switch } from "react-native-paper";
 import Button from "../../../components/Button";
 import StatCard from "./StatCard";
 import RecordingMap from "./RecordingMap";
@@ -28,7 +29,13 @@ type ConfirmContentProps = {
   onAddTag: () => void;
   onRemoveTag: (tag: string) => void;
   onPost: () => void;
+  /** 保存中 */
   posting?: boolean;
+  /** 保存済み（連打で二重に記録が増えないようボタンを止める） */
+  posted?: boolean;
+  /** タイムラインにも投稿するか */
+  shareToTimeline: boolean;
+  onToggleShareToTimeline: (value: boolean) => void;
 };
 
 function ConfirmContent({
@@ -42,7 +49,12 @@ function ConfirmContent({
   onRemoveTag,
   onPost,
   posting = false,
+  posted = false,
+  shareToTimeline,
+  onToggleShareToTimeline,
 }: ConfirmContentProps) {
+  const locked = posting || posted;
+
   return (
     <View style={styles.container}>
       <ScrollView
@@ -134,10 +146,29 @@ function ConfirmContent({
       </ScrollView>
 
       <View style={styles.footer}>
+        {/* 位置情報を含むので、投稿は本人がONにしたときだけ */}
+        <View style={styles.shareRow}>
+          <View style={styles.shareTextWrap}>
+            <Text style={styles.shareLabel}>タイムラインに投稿する</Text>
+            <Text style={styles.shareHint}>
+              {shareToTimeline
+                ? "この記録をタイムラインにも公開します"
+                : "OFFのときは自分の記録タブにだけ保存されます"}
+            </Text>
+          </View>
+          <Switch
+            value={shareToTimeline}
+            onValueChange={onToggleShareToTimeline}
+            disabled={locked}
+          />
+        </View>
+
         <Button
-          text={posting ? "保存中..." : "記録を確定する"}
-          onPress={onPost}
-          buttonColor={COLORS.primary}
+          text={
+            posted ? "保存しました" : posting ? "保存中..." : "記録を確定する"
+          }
+          onPress={locked ? () => {} : onPost}
+          buttonColor={locked ? COLORS.border : COLORS.primary}
           textColor={COLORS.white}
           style={styles.postButton}
         />
@@ -242,8 +273,29 @@ const styles = StyleSheet.create({
   footer: {
     paddingHorizontal: 16,
     paddingVertical: 16,
+    gap: 12,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: COLORS.border,
+  },
+  shareRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  shareTextWrap: {
+    flex: 1,
+    gap: 2,
+  },
+  shareLabel: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: COLORS.text,
+  },
+  shareHint: {
+    fontSize: 12,
+    color: COLORS.label,
+    lineHeight: 16,
   },
   postButton: {
     width: "100%",

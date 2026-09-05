@@ -55,3 +55,35 @@ export const addRecordLocation = async (
 
   return response.data;
 };
+
+// 一覧表示用（バックエンドから記録を取ってくる）↓
+
+/** GET /records が返す1件ぶんの形 */
+export type ServerRecord = {
+  id: string;
+  title: string;
+  startedAt: string;
+  endedAt: string | null;
+  createdAt: string;
+  story: string | null;
+  tags: string[];
+};
+
+/** GET /records/:id/locations が返す1点ぶんの形 */
+export type ServerLocation = {
+  id: string;
+  recordId: string;
+  latitude: number;
+  longitude: number;
+  recordedAt: string;
+};
+
+export const getRecordLocations = async (
+  recordId: string,
+): Promise<ServerLocation[]> => {
+  const response = await apiClient.get<ServerLocation[]>(
+    `/records/${recordId}/locations`,
+  );
+
+  return response.data;
+};

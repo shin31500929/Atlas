@@ -12,7 +12,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
-import { PostsService } from './posts.service';
+import { PostsService, type PostTrip } from './posts.service';
 
 @Controller('posts')
 export class PostsController {
@@ -36,7 +36,9 @@ export class PostsController {
     }),
   )
   create(
-    @Body() body: { content: string },
+    // trip は移動記録から投稿したときだけ入る。
+    // multipart で送られると JSON 文字列になるので、両方受け取れる型にしている。
+    @Body() body: { content: string; trip?: PostTrip | string },
     @UploadedFile() image?: Express.Multer.File,
   ) {
     return this.postsService.create(body, image);
