@@ -86,7 +86,7 @@ function ProfileScreen({ navigation }: Props) {
         >
           <Text style={{ textAlign: "center" }}>総移動距離</Text>
           <Text style={{ textAlign: "center", fontSize: 30 }}>0.0</Text>
-          <text style={{ textAlign: "center" }}>km</text>
+          <Text style={{ textAlign: "center" }}>km</Text>
         </View>
 
         <View
