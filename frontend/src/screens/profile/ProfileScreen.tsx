@@ -151,11 +151,7 @@ function ProfileScreen({ navigation }: Props) {
           <Text style={{ textAlign: "center" }}>保存済み</Text>
         </View>
       </View>
-      <View>
-        <FooterComponent>
-
-        </FooterComponent>
-      </View>
+      <FooterComponent />
           
     </View>
   );
