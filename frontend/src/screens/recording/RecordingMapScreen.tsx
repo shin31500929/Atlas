@@ -20,6 +20,9 @@ function RecordingMapScreen({ route }: Props) {
   const distanceKm = trip?.distanceKm ?? MOCK_SESSION.distanceKm;
   const maxSpeedKmh = trip?.maxSpeedKmh ?? MOCK_SESSION.maxSpeedKmh;
   const elapsedMs = trip?.elapsedMs ?? MOCK_SESSION.elapsedMs;
+  // trip があるときはその内容のみ（未入力なら表示しない）。モックは trip 未指定時だけ使う
+  const story = trip ? trip.story : MOCK_SESSION.story;
+  const tags = trip ? (trip.tags ?? []) : (MOCK_SESSION.tags ?? []);
 
   return (
     <SafeAreaView style={styles.container} edges={["bottom"]}>
@@ -43,10 +46,23 @@ function RecordingMapScreen({ route }: Props) {
           />
         </View>
 
-        {trip?.story ? (
+        {story ? (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>ストーリー</Text>
-            <Text style={styles.story}>{trip.story}</Text>
+            <Text style={styles.story}>{story}</Text>
+          </View>
+        ) : null}
+
+        {tags.length > 0 ? (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>タグ</Text>
+            <View style={styles.tagsRow}>
+              {tags.map((tag) => (
+                <Text key={tag} style={styles.tag}>
+                  #{tag.replace(/^#+/, "")}
+                </Text>
+              ))}
+            </View>
           </View>
         ) : null}
       </ScrollView>
@@ -79,6 +95,21 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 22,
     color: COLORS.text,
+  },
+  tagsRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  tag: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: COLORS.primary,
+    backgroundColor: COLORS.gpsBadgeBg,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 16,
+    overflow: "hidden",
   },
 });
 
