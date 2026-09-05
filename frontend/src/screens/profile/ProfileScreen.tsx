@@ -1,5 +1,5 @@
 import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
-import { View, Text, Button } from "react-native";
+import { View, Text } from "react-native";
 import type TabParamList from "../../navigation/TabType";
 import Iconcomponent from "../../components/Icon";
 import HeaderComponent from "../../components/Header";
