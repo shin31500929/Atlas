@@ -1,4 +1,3 @@
-import React from "react";
 import { View, StyleProp, ViewStyle, Image } from "react-native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
