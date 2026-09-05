@@ -7,7 +7,7 @@ import Header from "../../components/Header";
 import Button from "../../components/Button";
 import type RootStackParamList from "../../navigation/type";
 import DestinationSetupMap from "./components/DestinationSetupMap";
-import { COLORS } from "./constants";
+import { COLORS, DEFAULT_TOKYO, isInJapan } from "./constants";
 import type { LatLng } from "./types";
 
 type Props = NativeStackScreenProps<RootStackParamList, "DestinationSetup">;
@@ -17,6 +17,8 @@ function DestinationSetupScreen({ navigation }: Props) {
   const [destination, setDestination] = useState<LatLng | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  /** GPS が海外など不適切なとき東京に差し替えたか */
+  const [usingTokyoFallback, setUsingTokyoFallback] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -24,6 +26,7 @@ function DestinationSetupScreen({ navigation }: Props) {
     const init = async () => {
       setLoading(true);
       setError(null);
+      setUsingTokyoFallback(false);
 
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (!mounted) {
@@ -31,7 +34,9 @@ function DestinationSetupScreen({ navigation }: Props) {
       }
 
       if (status !== "granted") {
-        setError("位置情報の許可が必要です。設定から許可してください。");
+        setError("位置情報の許可が必要です。東京駅付近を現在地として表示します。");
+        setCurrentLocation(DEFAULT_TOKYO);
+        setUsingTokyoFallback(true);
         setLoading(false);
         return;
       }
@@ -43,18 +48,28 @@ function DestinationSetupScreen({ navigation }: Props) {
         if (!mounted) {
           return;
         }
-        setCurrentLocation({
+
+        const gps: LatLng = {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
-        });
+        };
+
+        if (isInJapan(gps)) {
+          setCurrentLocation(gps);
+          setUsingTokyoFallback(false);
+        } else {
+          // シミュレータの海外デフォルト位置などを東京に補正
+          setCurrentLocation(DEFAULT_TOKYO);
+          setUsingTokyoFallback(true);
+          setError(
+            "GPSが日本外だったため、現在地を東京駅付近に設定しました。",
+          );
+        }
       } catch {
         if (mounted) {
-          // シミュレータ等で取得失敗しても地図は出す
-          setError("現在地の取得に失敗しました。地図は表示できます。");
-          setCurrentLocation({
-            latitude: 35.6812,
-            longitude: 139.7671,
-          });
+          setError("現在地の取得に失敗したため、東京駅付近を表示しています。");
+          setCurrentLocation(DEFAULT_TOKYO);
+          setUsingTokyoFallback(true);
         }
       } finally {
         if (mounted) {
@@ -77,7 +92,7 @@ function DestinationSetupScreen({ navigation }: Props) {
 
     navigation.navigate("Recording", {
       destination,
-      startLocation: currentLocation ?? undefined,
+      startLocation: currentLocation ?? DEFAULT_TOKYO,
     });
   };
 
@@ -99,6 +114,7 @@ function DestinationSetupScreen({ navigation }: Props) {
             currentLocation={currentLocation}
             destination={destination}
             onSelectDestination={setDestination}
+            showDeviceUserLocation={!usingTokyoFallback}
           />
         )}
       </View>
@@ -107,7 +123,7 @@ function DestinationSetupScreen({ navigation }: Props) {
         {error ? <Text style={styles.error}>{error}</Text> : null}
         <Text style={styles.hint}>
           {destination
-            ? "赤いピンが目的地です。位置を直す場合は地図をタップするか、ピンをドラッグしてください。"
+            ? "赤いピンが目的地です。記録開始後、現在地から 1 m/s で直線移動して保存します。"
             : "地図をタップして、赤いピンを目的地に立ててください"}
         </Text>
         <Button

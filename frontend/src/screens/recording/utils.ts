@@ -12,6 +12,9 @@ export function formatElapsedTime(elapsedMs: number): string {
 }
 
 export function formatDistance(distanceKm: number): string {
+  if (distanceKm < 0.1) {
+    return distanceKm.toFixed(2);
+  }
   return distanceKm.toFixed(1);
 }
 

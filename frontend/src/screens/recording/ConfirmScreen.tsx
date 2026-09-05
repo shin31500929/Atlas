@@ -7,21 +7,57 @@ import type RootStackParamList from "../../navigation/type";
 import ConfirmContent from "./components/ConfirmContent";
 import { COLORS } from "./constants";
 import { saveTrip } from "./storage/tripStorage";
+import { updateRecordDetails } from "../../api/records";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Confirm">;
 
+function normalizeTag(raw: string): string | null {
+  const cleaned = raw.trim().replace(/^#+/, "").trim();
+  return cleaned.length > 0 ? cleaned : null;
+}
+
 function ConfirmScreen({ navigation, route }: Props) {
-  const { session } = route.params;
+  const { session, recordId } = route.params;
   const [saving, setSaving] = useState(false);
+  const [story, setStory] = useState(session.story ?? "");
+  const [tags, setTags] = useState<string[]>(session.tags ?? []);
+  const [tagInput, setTagInput] = useState("");
 
   const handleEdit = () => {
     navigation.goBack();
+  };
+
+  const handleAddTag = () => {
+    const tag = normalizeTag(tagInput);
+    if (!tag) {
+      setTagInput("");
+      return;
+    }
+    setTags((current) =>
+      current.some((item) => item.toLowerCase() === tag.toLowerCase())
+        ? current
+        : [...current, tag],
+    );
+    setTagInput("");
+  };
+
+  const handleRemoveTag = (tag: string) => {
+    setTags((current) => current.filter((item) => item !== tag));
   };
 
   const handlePost = async () => {
     if (saving) {
       return;
     }
+
+    // 入力中のタグも確定に含める
+    const pendingTag = normalizeTag(tagInput);
+    const finalTags =
+      pendingTag &&
+      !tags.some((item) => item.toLowerCase() === pendingTag.toLowerCase())
+        ? [...tags, pendingTag]
+        : tags;
+    const finalStory = story.trim();
 
     const startLocation = session.startLocation ?? session.route[0];
     const goalLocation =
@@ -39,6 +75,21 @@ function ConfirmScreen({ navigation, route }: Props) {
 
     setSaving(true);
     try {
+      if (recordId) {
+        try {
+          await updateRecordDetails(recordId, {
+            story: finalStory.length > 0 ? finalStory : null,
+            tags: finalTags,
+          });
+        } catch (error) {
+          console.error("ストーリー/タグ保存エラー:", error);
+          Alert.alert(
+            "バックエンドへの保存に失敗しました",
+            "ローカルには保存します。",
+          );
+        }
+      }
+
       await saveTrip({
         startLocation: {
           latitude: startLocation.latitude,
@@ -54,16 +105,22 @@ function ConfirmScreen({ navigation, route }: Props) {
         maxSpeedKmh: session.maxSpeedKmh,
         elapsedMs: session.elapsedMs,
         route: session.route,
-        story: session.story,
-        tags: session.tags,
+        story: finalStory.length > 0 ? finalStory : undefined,
+        tags: finalTags,
       });
 
-      Alert.alert("保存しました", "ホームに戻ります。", [
-        {
-          text: "OK",
-          onPress: () => navigation.popToTop(),
-        },
-      ]);
+      Alert.alert(
+        "保存しました",
+        recordId
+          ? "ストーリー・タグを含めてバックエンドと記録タブに保存しました。"
+          : "記録タブに保存しました。",
+        [
+          {
+            text: "OK",
+            onPress: () => navigation.popToTop(),
+          },
+        ],
+      );
     } catch {
       Alert.alert("保存に失敗しました", "もう一度お試しください。");
     } finally {
@@ -84,6 +141,13 @@ function ConfirmScreen({ navigation, route }: Props) {
 
         <ConfirmContent
           session={session}
+          story={story}
+          tags={tags}
+          tagInput={tagInput}
+          onChangeStory={setStory}
+          onChangeTagInput={setTagInput}
+          onAddTag={handleAddTag}
+          onRemoveTag={handleRemoveTag}
           onPost={handlePost}
           posting={saving}
         />
