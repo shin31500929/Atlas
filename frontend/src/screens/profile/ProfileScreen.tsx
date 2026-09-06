@@ -12,6 +12,7 @@ type Props = BottomTabScreenProps<TabParamList, "Profile">;
 function ProfileScreen({ navigation }: Props) {
   return (
     // todo:onBackPressが渡されているのに、動かない件
+    // todo:そばにより解決。当たり判定の問題。IconをくくるViewを下に下げる。
     <View style={{ flex: 1 }}>
       <View>
         <HeaderComponent
