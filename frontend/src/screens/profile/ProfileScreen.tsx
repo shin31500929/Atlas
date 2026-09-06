@@ -1,13 +1,11 @@
-import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
-import { View, Text } from "react-native";
-import type TabParamList from "../../navigation/TabType";
-import Iconcomponent from "../../components/Icon";
-import HeaderComponent from "../../components/Header";
-import CardComponent from "../../components/Card";
-import FooterComponent from "@/components/Footer";
 import ButtonComponent from "@/components/Button";
-import PostComponent from "@/components/PostCard";
+import FooterComponent from "@/components/Footer";
+import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
+import { Text, View } from "react-native";
+import HeaderComponent from "../../components/Header";
+import Iconcomponent from "../../components/Icon";
 import ProfileTab from "../../navigation/Profiletab";
+import type TabParamList from "../../navigation/TabType";
 
 type Props = BottomTabScreenProps<TabParamList, "Profile">;
 
@@ -47,8 +45,7 @@ function ProfileScreen({ navigation }: Props) {
           alignItems: "center",
           marginTop: 5,
         }}
-      >
-      </View>
+      ></View>
       <View
         style={{
           alignItems: "center",
@@ -62,7 +59,6 @@ function ProfileScreen({ navigation }: Props) {
           buttonColor="#138581"
         />
       </View>
-      
 
       <View
         style={{
@@ -88,8 +84,6 @@ function ProfileScreen({ navigation }: Props) {
           <Text style={{ textAlign: "center" }}>km</Text>
         </View>
 
-        
-
         <View
           style={{
             width: "45%",
@@ -106,14 +100,11 @@ function ProfileScreen({ navigation }: Props) {
         </View>
       </View>
 
-      <ProfileTab/>
-      
-      <View>
-        <FooterComponent>
+      <ProfileTab />
 
-        </FooterComponent>
+      <View>
+        <FooterComponent></FooterComponent>
       </View>
-          
     </View>
   );
 }
