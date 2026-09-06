@@ -11,6 +11,7 @@ type Props = BottomTabScreenProps<TabParamList, "Profile">;
 
 function ProfileScreen({ navigation }: Props) {
   return (
+    // todo:onBackPressが渡されているのに、動かない件
     <View style={{ flex: 1 }}>
       <View>
         <HeaderComponent
