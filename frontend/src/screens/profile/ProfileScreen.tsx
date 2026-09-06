@@ -102,7 +102,7 @@ function ProfileScreen({ navigation }: Props) {
         >
           <Text style={{ textAlign: "center" }}>最高速度</Text>
           <Text style={{ textAlign: "center", fontSize: 30 }}>0.0</Text>
-          <text style={{ textAlign: "center" }}>km/h</text>
+          <Text style={{ textAlign: "center" }}>km/h</Text>
         </View>
       </View>
 
