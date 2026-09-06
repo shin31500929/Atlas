@@ -25,12 +25,13 @@ function ProfileScreen({ navigation }: Props) {
       <View
         style={{
           alignItems: "center",
-          marginTop: -40,
+          marginTop: -30,
         }}
       >
         <Iconcomponent
           size={100}
           imageUri="https://images.unsplash.com/photo-1682685794700-1f3c7e5d8b4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80"
+          style={{ marginTop: 100 }}
         />
       </View>
 
