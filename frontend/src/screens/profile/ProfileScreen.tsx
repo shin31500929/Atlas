@@ -40,7 +40,6 @@ function ProfileScreen({ navigation }: Props) {
           marginTop: 5,
         }}
       >
-        <Text>a</Text>
       </View>
       <View
         style={{
