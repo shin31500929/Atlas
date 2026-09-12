@@ -1,6 +1,13 @@
 import { useState } from "react";
-import { ImageSourcePropType } from "react-native";
+import { ImageSourcePropType, View, StyleSheet, Pressable } from "react-native";
 import { Avatar, Button, Card as PaperCard, Text } from "react-native-paper";
+import type { PostTrip } from "../api/posts";
+import { COLORS } from "../screens/recording/constants";
+import {
+  formatDistance,
+  formatElapsedTime,
+  formatSpeed,
+} from "../screens/recording/utils";
 
 function CalcDiffTime(postedAt: Date) {
   const options = {
@@ -38,6 +45,10 @@ type Props = {
   likeCount: number;
   liked: boolean;
   onLike: () => void;
+  /** 移動記録から投稿されたものだけ入る */
+  trip?: PostTrip | null;
+  /** 移動記録の詳細を開く。記録が辿れる投稿だけ渡される */
+  onOpenTrip?: () => void;
 };
 
 const PostCard = (props: Props) => {
@@ -119,6 +130,41 @@ const PostCard = (props: Props) => {
         >
           {props.content}
         </Text>
+
+        {/* 移動記録から投稿されたものは、距離・最高速度・移動時間を出す。
+            記録が辿れる場合はタップで詳細（地図つき）へ */}
+        {props.trip ? (
+          <Pressable
+            onPress={props.onOpenTrip}
+            disabled={!props.onOpenTrip}
+            style={({ pressed }) => [
+              styles.tripBox,
+              props.onOpenTrip && pressed ? styles.tripBoxPressed : null,
+            ]}
+          >
+            <View style={styles.tripStatsRow}>
+              <Text style={styles.tripStat}>
+                {formatDistance(props.trip.distanceKm)} km
+              </Text>
+              <Text style={styles.tripDot}>·</Text>
+              <Text style={styles.tripStat}>
+                最高 {formatSpeed(props.trip.maxSpeedKmh)} km/h
+              </Text>
+              <Text style={styles.tripDot}>·</Text>
+              <Text style={styles.tripStat}>
+                {formatElapsedTime(props.trip.elapsedMs)}
+              </Text>
+            </View>
+            {props.trip.tags && props.trip.tags.length > 0 ? (
+              <Text style={styles.tripTags} numberOfLines={1}>
+                {props.trip.tags.map((tag) => `#${tag}`).join(" ")}
+              </Text>
+            ) : null}
+            {props.onOpenTrip ? (
+              <Text style={styles.tripLink}>移動の詳細を見る ›</Text>
+            ) : null}
+          </Pressable>
+        ) : null}
       </PaperCard.Content>
 
       <PaperCard.Actions
@@ -134,5 +180,46 @@ const PostCard = (props: Props) => {
     </PaperCard>
   );
 };
+
+const styles = StyleSheet.create({
+  tripBox: {
+    marginTop: 8,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    gap: 4,
+    backgroundColor: COLORS.white,
+  },
+  tripStatsRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: 4,
+  },
+  tripStat: {
+    fontSize: 13,
+    color: COLORS.text,
+    fontWeight: "600",
+  },
+  tripDot: {
+    fontSize: 13,
+    color: COLORS.border,
+  },
+  tripBoxPressed: {
+    backgroundColor: COLORS.gpsBadgeBg,
+  },
+  tripTags: {
+    fontSize: 12,
+    color: COLORS.primary,
+  },
+  tripLink: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: COLORS.primary,
+    marginTop: 2,
+  },
+});
 
 export default PostCard;

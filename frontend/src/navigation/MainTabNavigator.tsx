@@ -1,13 +1,13 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import HomeScreen from "../screens/home/HomeScreen";
-import PostScreen from "../screens/post/PostScreen";
-import ProfileScreen from "../screens/profile/ProfileScreen";
-// import SearchScreen from "../screens/search/SearchScreen";
 import { useWindowDimensions } from "react-native";
-import type TabType from "./TabType";
+import HomeScreen from "../screens/home/HomeScreen";
+import PostTabScreen from "../screens/post/PostTabScreen";
+import ProfileScreen from "../screens/profile/ProfileScreen";
+import RecordingTabScreen from "../screens/recording/RecordingTabScreen";
+import type TabParamList from "./TabType";
 
-const Tab = createBottomTabNavigator<TabType>();
+const Tab = createBottomTabNavigator<TabParamList>();
 
 function MainTabNavigator() {
   const dimensions = useWindowDimensions();
@@ -21,6 +21,7 @@ function MainTabNavigator() {
         name="Home"
         component={HomeScreen}
         options={{
+          title: "タイムライン",
           tabBarShowLabel: false,
           tabBarIcon: ({ focused, color, size }) => (
             <Ionicons
@@ -31,24 +32,11 @@ function MainTabNavigator() {
           ),
         }}
       />
-      {/* <Tab.Screen
-        name="Search"
-        component={SearchScreen}
-        options={{
-          tabBarShowLabel: false,
-          tabBarIcon: ({ focused, color, size }) => (
-            <Ionicons
-              name={focused ? "search" : "search-outline"}
-              size={size}
-              color={color}
-            />
-          ),
-        }}
-      /> */}
       <Tab.Screen
         name="Post"
-        component={PostScreen}
+        component={PostTabScreen}
         options={{
+          title: "投稿",
           tabBarShowLabel: false,
           tabBarIcon: ({ focused, color, size }) => (
             <Ionicons
@@ -60,9 +48,25 @@ function MainTabNavigator() {
         }}
       />
       <Tab.Screen
+        name="Recording"
+        component={RecordingTabScreen}
+        options={{
+          title: "記録",
+          tabBarShowLabel: false,
+          tabBarIcon: ({ focused, color, size }) => (
+            <Ionicons
+              name={focused ? "navigate" : "navigate-outline"}
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
         name="Profile"
         component={ProfileScreen}
         options={{
+          title: "プロフィール",
           tabBarShowLabel: false,
           tabBarIcon: ({ focused, color, size }) => (
             <Ionicons

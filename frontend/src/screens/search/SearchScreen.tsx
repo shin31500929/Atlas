@@ -1,10 +1,6 @@
-import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Text, View } from "react-native";
-import type RootStackParamList from "../../navigation/type";
 
-type Props = NativeStackScreenProps<RootStackParamList, "Search">;
-
-function SearchScreen({ navigation }: Props) {
+function SearchScreen() {
   return (
     <View
       style={{
