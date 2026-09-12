@@ -11,16 +11,7 @@ type Post = {
 
 @Injectable()
 export class PostsService {
-  private posts: Post[] = [
-    {
-      id: '1',
-      content: '東京を散策しました',
-      imagePath: null,
-      likeCount: 0,
-      liked: false,
-      createdAt: new Date().toISOString(),
-    },
-  ];
+  private posts: Post[] = [];
 
   findAll(limit: number, offset: number) {
     return this.posts.slice(offset, offset + limit);
